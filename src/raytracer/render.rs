@@ -62,7 +62,15 @@ pub fn render(mut rng: ThreadRng, width: usize, height: usize,
         ]
     };
 
-    let cam = Camera::new(16.0 / 9.0, 2.0, 1.0);
+    let lookfrom = Vector3d { x: 0.0, y: 0.0, z: 0.0 };
+    let lookat = Vector3d { x: 0.0, y: 0.0, z: -1.0 };
+    let vup = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
+    let dist_to_focus = (lookfrom - &lookat).length();
+    let aperture = 0.4;
+
+    let aspect_ratio = width as f64 / height as f64;
+
+    let cam = Camera::new(&lookfrom, &lookat, &vup, 90.0, aspect_ratio, aperture, dist_to_focus);
 
     for y in 0..height {
         for x in 0..width {
@@ -70,7 +78,7 @@ pub fn render(mut rng: ThreadRng, width: usize, height: usize,
             for _ in 0..samples_per_pixel {
                 let u = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
                 let v = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
-                let r = cam.get_ray(u, v);
+                let r = cam.get_ray(rng, u, v);
                 pixel_color = pixel_color + &ray_color(rng, &r, &world, max_depth);
             }
             image.set(x, y, pixel_color.sqrt() / (samples_per_pixel as f64).sqrt());

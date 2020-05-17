@@ -10,7 +10,7 @@ use raytracer::*;
 mod raytracer;
 
 fn main() {
-    let pixel_scale = 8;
+    let pixel_scale = 4;
     let samples_per_pixel = 100;
     let max_depth = 50;
 

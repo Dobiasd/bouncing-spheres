@@ -1,3 +1,4 @@
+use core::fmt;
 use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Sub};
 
@@ -9,6 +10,14 @@ pub struct Vector3d {
     pub x: f64,
     pub y: f64,
     pub z: f64,
+}
+
+// Similarly, implement `Display` for `Point2D`
+impl fmt::Display for Vector3d {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Customize so only `x` and `y` are denoted.
+        write!(f, "x: {}, y: {}, z: {}", self.x, self.y, self.z)
+    }
 }
 
 impl Vector3d {
@@ -59,11 +68,11 @@ pub fn dot(a: &Vector3d, b: &Vector3d) -> f64 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
+pub fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
     return Vector3d {
-        x: a.y * b.z - a.z - b.y,
-        y: a.z * b.x - a.x - b.z,
-        z: a.x * b.y - a.y - b.x,
+        x: a.y * b.z - a.z * b.y,
+        y: a.z * b.x - a.x * b.z,
+        z: a.x * b.y - a.y * b.x,
     };
 }
 
@@ -117,4 +126,20 @@ pub fn random_in_hemisphere(mut rng: ThreadRng, normal: &Vector3d) -> Vector3d {
 
 pub fn reflect(v: &Vector3d, n: &Vector3d) -> Vector3d {
     return *v - &(((*n * dot(v, n))) * 2.0 as f64);
+}
+
+pub fn random_in_unit_disk(mut rng: ThreadRng) -> Vector3d {
+    let mut p = Vector3d {
+        x: rng.gen_range(-1.0, 1.0),
+        y: rng.gen_range(-1.0, 1.0),
+        z: 0.0,
+    };
+    while p.length_squared() >= 1.0 {
+        p = Vector3d {
+            x: rng.gen_range(-1.0, 1.0),
+            y: rng.gen_range(-1.0, 1.0),
+            z: 0.0,
+        };
+    }
+    return p;
 }
