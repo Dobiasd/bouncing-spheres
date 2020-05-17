@@ -1,4 +1,8 @@
+use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Sub};
+
+use rand::prelude::ThreadRng;
+use rand::Rng;
 
 #[derive(Copy, Clone)]
 pub struct Vector3d {
@@ -58,4 +62,48 @@ fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
 
 pub fn unit_vector(v: &Vector3d) -> Vector3d {
     return *v / v.length();
+}
+
+pub fn random_vector3d_0_to_1(mut rng: ThreadRng) -> Vector3d {
+    return Vector3d {
+        x: rng.gen::<f64>(),
+        y: rng.gen::<f64>(),
+        z: rng.gen::<f64>(),
+    };
+}
+
+pub fn random_vector3d(mut rng: ThreadRng, min: f64, max: f64) -> Vector3d {
+    return Vector3d {
+        x: rng.gen_range(min, max),
+        y: rng.gen_range(min, max),
+        z: rng.gen_range(min, max),
+    };
+}
+
+pub fn random_unit_vector(mut rng: ThreadRng) -> Vector3d {
+    let a = rng.gen_range(0.0, 2.0 * PI);
+    let z = rng.gen_range(-1.0 as f64, 1.0 as f64);
+    let r = (1.0 - z * z).sqrt();
+    return Vector3d {
+        x: r * a.cos(),
+        y: r * a.sin(),
+        z,
+    };
+}
+
+pub fn random_in_unit_sphere(mut rng: ThreadRng) -> Vector3d {
+    let mut p = random_vector3d(rng, -1.0, 1.0);
+    while p.length_squared() >= 1.0 {
+        p = random_vector3d(rng, -1.0, 1.0);
+    }
+    return p;
+}
+
+pub fn random_in_hemisphere(mut rng: ThreadRng, normal: &Vector3d) -> Vector3d {
+    let in_unit_sphere = random_in_unit_sphere(rng);
+    return if dot(&in_unit_sphere, normal) > 0.0 {
+        in_unit_sphere
+    } else {
+        in_unit_sphere * -1.0
+    };
 }

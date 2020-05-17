@@ -6,13 +6,18 @@ use crate::raytracer::floatcolor::FloatColor;
 use crate::raytracer::floatimage::FloatImage;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::sphere::{HittableSpheres, Sphere};
-use crate::raytracer::vector3d::{unit_vector, Vector3d};
+use crate::raytracer::vector3d::{random_in_hemisphere, unit_vector, Vector3d};
 
-fn ray_color(r: &Ray, spheres: &HittableSpheres) -> FloatColor {
+fn ray_color(mut rng: ThreadRng, r: &Ray, spheres: &HittableSpheres, depth: usize) -> FloatColor {
+    if depth <= 0 {
+        return FloatColor { r: 0.0, g: 0.0, b: 0.0 };
+    }
     let t_min = 0.001;
     let t_max = 99999999.9;
     match spheres.hit(r, t_min, t_max) {
         Some(rec) => {
+            let target = rec.p + &random_in_hemisphere(rng, &rec.normal);
+            return ray_color(rng, &Ray { origin: rec.p, direction: target - &rec.p }, &spheres, depth - 1) * 0.5;
             return FloatColor {
                 r: rec.normal.x + 1.0,
                 g: rec.normal.y + 1.0,
@@ -40,6 +45,7 @@ pub fn render(mut rng: ThreadRng, width: usize, height: usize) -> FloatImage {
     let cam = Camera::new(16.0 / 9.0, 2.0, 1.0);
 
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     for y in 0..height {
         for x in 0..width {
@@ -48,7 +54,7 @@ pub fn render(mut rng: ThreadRng, width: usize, height: usize) -> FloatImage {
                 let u = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
                 let v = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
                 let r = cam.get_ray(u, v);
-                pixel_color = pixel_color + &ray_color(&r, &world);
+                pixel_color = pixel_color + &ray_color(rng, &r, &world, max_depth);
             }
             image.set(x, y, pixel_color / samples_per_pixel as f64);
         }

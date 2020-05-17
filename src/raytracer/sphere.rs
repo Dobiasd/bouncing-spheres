@@ -38,6 +38,7 @@ fn hit_sphere(center: &Vector3d, radius: f64, r: &Ray, t_min: f64, t_max: f64) -
     if discriminant > 0.0 {
         let root = discriminant.sqrt();
         let temp = (-half_b - root) / a;
+        // todo: remove duplication of these two blocks
         if temp < t_max && temp > t_min {
             let p = r.at(temp);
             let outward_normal = (p - center) / radius;
