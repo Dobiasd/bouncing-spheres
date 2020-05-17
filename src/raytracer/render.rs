@@ -26,6 +26,7 @@ fn ray_color(mut rng: ThreadRng, r: &Ray, spheres: &HittableSpheres, depth: usiz
         }
         None => {}
     }
+    // todo: make nice evening background
     let unit_direction = unit_vector(&r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);
     let col1 = FloatColor { r: 1.0, g: 1.0, b: 1.0 };
@@ -34,43 +35,9 @@ fn ray_color(mut rng: ThreadRng, r: &Ray, spheres: &HittableSpheres, depth: usiz
 }
 
 pub fn render(mut rng: ThreadRng, width: usize, height: usize,
-              samples_per_pixel: usize, max_depth: usize) -> FloatImage {
+              samples_per_pixel: usize, max_depth: usize,
+              world: &HittableSpheres, cam: &Camera) -> FloatImage {
     let mut image = FloatImage::new(width, height);
-
-    let world = HittableSpheres {
-        spheres: vec![
-            Sphere {
-                center: Vector3d { x: 0.0, y: 0.0, z: -1.0 },
-                radius: 0.5,
-                material: Material { albedo: FloatColor { r: 0.7, g: 0.3, b: 0.3 }, reflectiveness: 0.0, fuzz: 0.0 },
-            },
-            Sphere {
-                center: Vector3d { x: 0.0, y: -100.5, z: -1.0 },
-                radius: 100.0,
-                material: Material { albedo: FloatColor { r: 0.8, g: 0.8, b: 0.0 }, reflectiveness: 0.0, fuzz: 0.0 },
-            },
-            Sphere {
-                center: Vector3d { x: 1.0, y: 0.0, z: -1.0 },
-                radius: 0.5,
-                material: Material { albedo: FloatColor { r: 0.8, g: 0.6, b: 0.2 }, reflectiveness: 0.9, fuzz: 0.4 },
-            },
-            Sphere {
-                center: Vector3d { x: -1.0, y: 0.0, z: -1.0 },
-                radius: 0.5,
-                material: Material { albedo: FloatColor { r: 0.8, g: 0.8, b: 0.8 }, reflectiveness: 1.0, fuzz: 0.1 },
-            }
-        ]
-    };
-
-    let lookfrom = Vector3d { x: 0.0, y: 0.0, z: 0.0 };
-    let lookat = Vector3d { x: 0.0, y: 0.0, z: -1.0 };
-    let vup = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
-    let dist_to_focus = (lookfrom - &lookat).length();
-    let aperture = 0.4;
-
-    let aspect_ratio = width as f64 / height as f64;
-
-    let cam = Camera::new(&lookfrom, &lookat, &vup, 90.0, aspect_ratio, aperture, dist_to_focus);
 
     for y in 0..height {
         for x in 0..width {

@@ -3,10 +3,11 @@ use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
 
+#[derive(Copy, Clone)]
 pub struct Sphere {
     pub center: Vector3d,
     pub radius: f64,
-    pub material: Material
+    pub material: Material,
 }
 
 pub struct HittableSpheres {
@@ -18,7 +19,7 @@ impl HittableSpheres {
         let mut closest_so_far = t_max;
         let mut rec: Option<HitRecord> = None;
         for sphere in &self.spheres {
-            match hit_sphere(&sphere.center, sphere.radius, r, &sphere.material, t_min,closest_so_far) {
+            match hit_sphere(&sphere.center, sphere.radius, r, &sphere.material, t_min, closest_so_far) {
                 Some(temp_rec) => {
                     closest_so_far = temp_rec.t;
                     rec = Some(temp_rec);

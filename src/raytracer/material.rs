@@ -6,7 +6,6 @@ use crate::raytracer::hitrecord::HitRecord;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, random_in_unit_sphere, random_unit_vector, reflect, unit_vector};
 
-// todo: can this be removed?
 #[derive(Copy, Clone)]
 pub struct Material {
     pub albedo: FloatColor,
