@@ -1,4 +1,3 @@
-
 use std::ops::{Add, Div, Mul, Sub};
 use std::prelude::v1::Vec;
 use std::time::SystemTime;
@@ -62,7 +61,6 @@ fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
     };
 }
 
-fn unit_vector(v: &Vector3d) -> Vector3d {
+pub fn unit_vector(v: &Vector3d) -> Vector3d {
     return *v / v.length();
 }
-

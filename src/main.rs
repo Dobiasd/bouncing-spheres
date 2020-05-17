@@ -1,12 +1,13 @@
-mod raytracer;
-
 use std::ops::{Add, Div, Mul, Sub};
 use std::prelude::v1::Vec;
 use std::time::SystemTime;
 
 use pixel_canvas::{Canvas, Color, input::MouseState};
 use rand::prelude::*;
+
 use raytracer::*;
+
+mod raytracer;
 
 fn main() {
     let pixel_scale = 4;
@@ -19,7 +20,7 @@ fn main() {
     canvas.render(move |mouse, image| {
         let width = image.width() as usize;
         let height = image.height() as usize;
-        let pixels = raytracer::render(rng, width / pixel_scale, height / pixel_scale);
+        let pixels = raytracer::render::render(rng, width / pixel_scale, height / pixel_scale);
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
                 let c = pixels.get(x / pixel_scale, y / pixel_scale);
