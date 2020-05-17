@@ -19,7 +19,7 @@ mod raytracer;
 fn random_sphere(mut rng: ThreadRng) -> Sphere {
     let min = -10.0;
     let max = 10.0;
-    let radius = rng.gen_range(0.5, 3.0);
+    let radius = rng.gen_range(0.5, 1.5);
     Sphere {
         center: Vector3d {
             x: rng.gen_range(min, max),
@@ -33,16 +33,16 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
                 g: rng.gen_range(0.0, 1.0),
                 b: rng.gen_range(0.0, 1.0),
             },
-            reflectiveness: rng.gen_range(0.0, 1.0),
-            fuzz: rng.gen_range(0.0, 1.0),
+            reflectiveness: (rng.gen_range(0.0, 3.0) as f64).min(1.0),
+            fuzz: (rng.gen_range(-3.0, 1.0) as f64).max(0.0),
         },
     }
 }
 
 fn make_world(mut rng: ThreadRng) -> HittableSpheres {
     let planet = Sphere {
-        center: Vector3d { x: 0.0, y: -200.0, z: 0.0 },
-        radius: 200.0,
+        center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
+        radius: 300.0,
         material: Material { albedo: FloatColor { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
     };
     let objects = (0..32).map(|x| random_sphere(rng)).collect::<Vec<Sphere>>();
@@ -72,6 +72,7 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 }
 
 // todo: spheres have dark border. Is this right?
+// todo: multi core
 fn main() {
     let pixel_scale = 2;
     let samples_per_pixel = 1024;
