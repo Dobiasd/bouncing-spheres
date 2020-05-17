@@ -1,11 +1,3 @@
-use std::ops::{Add, Div, Mul, Sub};
-use std::prelude::v1::Vec;
-use std::time::SystemTime;
-
-use pixel_canvas::{Canvas, Color, input::MouseState};
-use rand::prelude::*;
-
-use crate::raytracer::{ray, vector3d};
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
 

@@ -1,13 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
-use std::prelude::v1::Vec;
-use std::time::SystemTime;
-
-use pixel_canvas::{Canvas, Color, input::MouseState};
-use rand::prelude::*;
-
-use crate::raytracer::ray;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d;
 use crate::raytracer::vector3d::Vector3d;
 
 pub struct Camera {
@@ -19,7 +10,10 @@ pub struct Camera {
 
 impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
-        return Ray { origin: self.origin, direction: self.lower_left_corner + &(self.horizontal * u) + &(self.vertical * v) - &self.origin };
+        return Ray {
+            origin: self.origin,
+            direction: self.lower_left_corner + &(self.horizontal * u) + &(self.vertical * v) - &self.origin,
+        };
     }
 }
 

@@ -1,10 +1,11 @@
 use rand::prelude::ThreadRng;
 use rand::Rng;
 
-use crate::raytracer::{camera, floatcolor, floatimage, ray, sphere, vector3d};
+use crate::raytracer::camera::Camera;
 use crate::raytracer::floatcolor::FloatColor;
+use crate::raytracer::floatimage::FloatImage;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::sphere::HittableSpheres;
+use crate::raytracer::sphere::{HittableSpheres, Sphere};
 use crate::raytracer::vector3d::{unit_vector, Vector3d};
 
 fn ray_color(r: &Ray, spheres: &HittableSpheres) -> FloatColor {
@@ -12,7 +13,11 @@ fn ray_color(r: &Ray, spheres: &HittableSpheres) -> FloatColor {
     let t_max = 99999999.9;
     match spheres.hit(r, t_min, t_max) {
         Some(rec) => {
-            return FloatColor { r: rec.normal.x + 1.0, g: rec.normal.y + 1.0, b: rec.normal.z + 1.0 } * 0.5;
+            return FloatColor {
+                r: rec.normal.x + 1.0,
+                g: rec.normal.y + 1.0,
+                b: rec.normal.z + 1.0,
+            } * 0.5;
         }
         None => {}
     }
@@ -23,16 +28,16 @@ fn ray_color(r: &Ray, spheres: &HittableSpheres) -> FloatColor {
     return col1 * (1.0 - t) + &(col2 * t);
 }
 
-pub fn render(mut rng: ThreadRng, width: usize, height: usize) -> floatimage::FloatImage {
-    let mut image = floatimage::FloatImage::new(width, height);
+pub fn render(mut rng: ThreadRng, width: usize, height: usize) -> FloatImage {
+    let mut image = FloatImage::new(width, height);
 
     let world = HittableSpheres {
         spheres: vec![
-            sphere::Sphere { center: Vector3d { x: 0.0, y: 0.0, z: -1.0 }, radius: 0.5 },
-            sphere::Sphere { center: Vector3d { x: 0.0, y: -100.5, z: -1.0 }, radius: 100.0 }]
+            Sphere { center: Vector3d { x: 0.0, y: 0.0, z: -1.0 }, radius: 0.5 },
+            Sphere { center: Vector3d { x: 0.0, y: -100.5, z: -1.0 }, radius: 100.0 }]
     };
 
-    let cam = camera::Camera::new(16.0 / 9.0, 2.0, 1.0);
+    let cam = Camera::new(16.0 / 9.0, 2.0, 1.0);
 
     let samples_per_pixel = 100;
 

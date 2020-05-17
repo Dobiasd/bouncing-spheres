@@ -1,6 +1,4 @@
-use std::ops::{Add, Div, Mul, Sub};
-use std::prelude::v1::Vec;
-use std::time::SystemTime;
+use std::ops::{Add, Div, Mul};
 
 #[derive(Copy, Clone)]
 pub struct FloatColor {
@@ -29,4 +27,3 @@ impl Add<&FloatColor> for FloatColor {
         return FloatColor { r: self.r + other.r, g: self.g + other.g, b: self.b + other.b };
     }
 }
-

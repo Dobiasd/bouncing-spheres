@@ -1,7 +1,3 @@
-use std::ops::{Add, Div, Mul, Sub};
-use std::prelude::v1::Vec;
-use std::time::SystemTime;
-
 use crate::raytracer::vector3d::Vector3d;
 
 pub struct Ray {
@@ -14,4 +10,3 @@ impl Ray {
         return self.origin + &(self.direction * t);
     }
 }
-

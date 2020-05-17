@@ -1,8 +1,3 @@
-use std::ops::{Add, Div, Mul, Sub};
-use std::prelude::v1::Vec;
-use std::time::SystemTime;
-
-use crate::raytracer::floatcolor;
 use crate::raytracer::floatcolor::FloatColor;
 
 pub struct FloatImage {
