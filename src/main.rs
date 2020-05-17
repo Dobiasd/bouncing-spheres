@@ -10,7 +10,10 @@ use raytracer::*;
 mod raytracer;
 
 fn main() {
-    let pixel_scale = 4;
+    let pixel_scale = 8;
+    let samples_per_pixel = 100;
+    let max_depth = 50;
+
     let canvas = Canvas::new(1280, 720)
         .title("raytracer")
         .state(MouseState::new())
@@ -20,7 +23,9 @@ fn main() {
     canvas.render(move |mouse, image| {
         let width = image.width() as usize;
         let height = image.height() as usize;
-        let pixels = raytracer::render::render(rng, width / pixel_scale, height / pixel_scale);
+        let pixels = raytracer::render::render(
+            rng, width / pixel_scale, height / pixel_scale,
+            samples_per_pixel, max_depth);
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
                 let c = pixels.get(x / pixel_scale, y / pixel_scale);

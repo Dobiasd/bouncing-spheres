@@ -41,6 +41,13 @@ impl Mul<f64> for Vector3d {
     }
 }
 
+impl Mul<&Vector3d> for Vector3d {
+    type Output = Vector3d;
+    fn mul(self, other: &Vector3d) -> Vector3d {
+        return Vector3d { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z };
+    }
+}
+
 impl Div<f64> for Vector3d {
     type Output = Vector3d;
     fn div(self, t: f64) -> Vector3d {
@@ -106,4 +113,8 @@ pub fn random_in_hemisphere(mut rng: ThreadRng, normal: &Vector3d) -> Vector3d {
     } else {
         in_unit_sphere * -1.0
     };
+}
+
+pub fn reflect(v: &Vector3d, n: &Vector3d) -> Vector3d {
+    return *v - &(((*n * dot(v, n))) * 2.0 as f64);
 }

@@ -6,3 +6,4 @@ pub mod floatimage;
 pub mod sphere;
 pub mod hitrecord;
 pub mod render;
+pub mod material;

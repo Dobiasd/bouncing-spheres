@@ -1,5 +1,6 @@
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
+use crate::raytracer::material::Material;
 
 #[derive(Copy, Clone)]
 pub struct HitRecord {
@@ -7,6 +8,7 @@ pub struct HitRecord {
     pub t: f64,
     pub normal: Vector3d,
     pub front_face: bool,
+    pub material: Material
 }
 
 pub fn face_normal(r: &Ray, outward_normal: &Vector3d) -> (bool, Vector3d) {
