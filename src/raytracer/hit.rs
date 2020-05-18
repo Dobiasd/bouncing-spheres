@@ -2,12 +2,12 @@ use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
 
-pub struct Hit {
+pub struct Hit<'a> {
     pub position: Vector3d,
     pub t: f64,
     pub normal: Vector3d,
     pub front_face: bool,
-    pub material: Material,
+    pub material: &'a Material,
 }
 
 pub fn face_normal(r: &Ray, outward_normal: &Vector3d) -> (bool, Vector3d) {

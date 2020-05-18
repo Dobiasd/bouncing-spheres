@@ -3,7 +3,6 @@ use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
 
-#[derive(Copy, Clone)]
 pub struct Sphere {
     pub center: Vector3d,
     pub radius: f64,
@@ -24,7 +23,7 @@ impl Sphere {
             t,
             normal,
             front_face,
-            material: self.material,
+            material: &self.material,
         };
     }
     pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {

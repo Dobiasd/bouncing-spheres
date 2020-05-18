@@ -6,7 +6,6 @@ use crate::raytracer::hit::Hit;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, random_unit_vector, reflect, unit_vector};
 
-#[derive(Copy, Clone)]
 pub struct Material {
     pub albedo: Color,
     pub reflectiveness: f64,

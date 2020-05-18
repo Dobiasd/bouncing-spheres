@@ -49,9 +49,10 @@ fn make_world(rng: ThreadRng) -> World {
         radius: 300.0,
         material: Material { albedo: Color { r: 0.3, g: 0.7, b: 0.2 }, reflectiveness: 0.0, reflection_fuzz: 0.0 },
     };
-    let objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
+    let mut objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
+    objects.extend(vec![planet]);
     World {
-        spheres: [&objects[..], &vec![planet][..]].concat()
+        spheres: objects
     }
 }
 
@@ -68,11 +69,11 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
         y: 1.3 * (0.34 * t).cos(),
         z: 1.3 * (0.41 * t).cos(),
     };
-    let vup = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
+    let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_focus = (position - &looks_at).length();
     let aperture = 0.0;
     let aspect_ratio = width as f64 / height as f64;
-    return Camera::new(&position, &looks_at, &vup, 90.0, aspect_ratio, aperture, dist_to_focus);
+    return Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus);
 }
 
 // todo: spheres have dark border. Is this right?
