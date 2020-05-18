@@ -86,7 +86,7 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 fn create_video(dir_path_str: &str) {
     let video_path = format!("{}.mp4", dir_path_str);
     println!("Saving {}", video_path);
-    let output = Command::new("ffmpeg")
+    Command::new("ffmpeg")
         .arg("-i")
         .arg(format!("{}/%08d.png", dir_path_str))
         .arg("-c:v")
@@ -111,9 +111,6 @@ fn create_video(dir_path_str: &str) {
         .arg(video_path)
         .output()
         .expect("failed to execute ffmpeg");
-    println!("{}", output.status);
-    println!("{}", std::str::from_utf8(&output.stderr[..]).expect("wat"));
-    println!("{}", std::str::from_utf8(&output.stdout[..]).expect("wat"));
 }
 
 #[derive(Debug, Deserialize)]
@@ -150,7 +147,7 @@ fn main() {
     let datetime: DateTime<Utc> = start_time.into();
 
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
-    fs::create_dir_all(Path::new(&dir_path_str)).expect("wat");
+    fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
 
     let mut t = 0.0;
     let mut frame_num = 0;
