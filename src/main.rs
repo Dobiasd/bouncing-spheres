@@ -1,6 +1,7 @@
 extern crate chrono;
 
 use std::fs;
+use std::ops::{Add, Div};
 use std::path::Path;
 use std::prelude::v1::Vec;
 use std::time::SystemTime;
@@ -16,18 +17,17 @@ use crate::raytracer::material::Material;
 use crate::raytracer::sphere::Sphere;
 use crate::raytracer::vector3d::Vector3d;
 use crate::raytracer::world::World;
-use std::ops::{Div, Add};
 
 mod raytracer;
 
 fn random_sphere(mut rng: ThreadRng) -> Sphere {
-    let min = -10.0;
-    let max = 10.0;
-    let radius = 0.4 + 1.8 * rng.gen_range(-6.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
+    let min = -24.0;
+    let max = 24.0;
+    let radius = 0.4 + 1.8 * rng.gen_range(-12.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
     Sphere {
         center: Vector3d {
             x: rng.gen_range(min, max),
-            y: radius + rng.gen_range(-radius * 0.8, radius * 2.0),
+            y: radius,
             z: rng.gen_range(min, max),
         },
         radius,
@@ -45,11 +45,11 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
 
 fn make_world(rng: ThreadRng) -> World {
     let planet = Sphere {
-        center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
-        radius: 300.0,
-        material: Material { albedo: Color { r: 0.3, g: 0.7, b: 0.2 }, reflectiveness: 0.0, reflection_fuzz: 0.0 },
+        center: Vector3d { x: 0.0, y: -3000.0, z: 0.0 },
+        radius: 3000.0,
+        material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
     };
-    let mut objects = (0..42).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
+    let mut objects = (0..200).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
     objects.extend(vec![planet]);
     World {
         spheres: objects
@@ -60,14 +60,14 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     let speed = 0.5;
     let dist = 12.5;
     let position = Vector3d {
-        x: dist * (speed * t).sin(),
-        y: 5.0 + 4.5 * (0.4 * t).cos(),
-        z: dist * (speed * t).cos(),
+        x: dist * (speed * 0.23 * t).sin(),
+        y: 5.0 + 4.999 * (0.4 * t).cos(),
+        z: dist * (speed * 0.31 * t).cos(),
     };
     let looks_at = Vector3d {
-        x: 1.3 * (0.2 * t).cos(),
-        y: 1.3 * (0.34 * t).cos(),
-        z: 1.3 * (0.41 * t).cos(),
+        x: 5.3 * (0.21 * t).cos(),
+        y: 2.3 * (0.34 * t).cos(),
+        z: 5.3 * (0.41 * t).cos(),
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_focus = (position - &looks_at).length();
@@ -77,14 +77,13 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 }
 
 // todo: spheres have dark border. Is this right?
-// todo: multi core
 fn main() {
     //let pixel_scale = 1;
     //let samples_per_pixel = 1024;
     //let max_depth = 64;
 
-    let pixel_scale = 8;
-    let samples_per_pixel = 8;
+    let pixel_scale = 4;
+    let samples_per_pixel = 4;
     let max_depth = 4;
     let t_step = 0.2;
 

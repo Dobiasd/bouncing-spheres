@@ -1,4 +1,5 @@
 use std::ops::{Add, Div, Mul};
+
 use pixel_canvas::Color as CanvasColor;
 
 #[derive(Copy, Clone)]
