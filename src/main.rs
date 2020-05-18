@@ -76,7 +76,7 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_focus = (position - &looks_at).length();
-    let aperture = 0.0;
+    let aperture = 0.28;
     let aspect_ratio = width as f64 / height as f64;
     Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus)
 }
