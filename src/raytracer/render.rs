@@ -9,6 +9,7 @@ use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::unit_vector;
 use crate::raytracer::world::World;
 
+#[inline(always)]
 fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize) -> Color {
     if depth <= 0 {
         return Color { r: 0.0, g: 0.0, b: 0.0 };

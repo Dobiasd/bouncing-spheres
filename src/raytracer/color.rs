@@ -28,6 +28,7 @@ impl Color {
 
 impl Mul<f64> for Color {
     type Output = Color;
+    #[inline(always)]
     fn mul(self, f: f64) -> Color {
         return Color { r: self.r * f, g: self.g * f, b: self.b * f };
     }
@@ -35,6 +36,7 @@ impl Mul<f64> for Color {
 
 impl Mul<&Color> for Color {
     type Output = Color;
+    #[inline(always)]
     fn mul(self, other: &Color) -> Color {
         return Color { r: self.r * other.r, g: self.g * other.g, b: self.b * other.b };
     }
@@ -42,6 +44,7 @@ impl Mul<&Color> for Color {
 
 impl Div<f64> for Color {
     type Output = Color;
+    #[inline(always)]
     fn div(self, f: f64) -> Color {
         return Color { r: self.r / f, g: self.g / f, b: self.b / f };
     }
@@ -49,6 +52,7 @@ impl Div<f64> for Color {
 
 impl Add<&Color> for Color {
     type Output = Color;
+    #[inline(always)]
     fn add(self, other: &Color) -> Color {
         return Color { r: self.r + other.r, g: self.g + other.g, b: self.b + other.b };
     }

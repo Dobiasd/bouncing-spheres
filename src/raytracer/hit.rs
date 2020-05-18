@@ -10,6 +10,7 @@ pub struct Hit<'a> {
     pub material: &'a Material,
 }
 
+#[inline(always)]
 pub fn face_normal(r: &Ray, outward_normal: &Vector3d) -> (bool, Vector3d) {
     let front_face = dot(&r.direction, outward_normal) < 0.0;
     let normal = if front_face {

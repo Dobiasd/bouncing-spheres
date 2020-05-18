@@ -14,6 +14,7 @@ fn is_in_interval(x: f64, min: f64, max: f64) -> bool {
 }
 
 impl Sphere {
+    #[inline(always)]
     fn calculate_hit(&self, ray: &Ray, t: f64) -> Hit {
         let p = ray.at(t);
         let outward_normal = (p - &self.center) / self.radius;
@@ -26,6 +27,8 @@ impl Sphere {
             material: &self.material,
         };
     }
+
+    #[inline(always)]
     pub fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let ray_origin_to_center = ray.origin - &self.center;
         let day_direction_squared_length = ray.direction.length_squared();

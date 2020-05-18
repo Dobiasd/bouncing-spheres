@@ -44,9 +44,10 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
 }
 
 fn make_world(rng: ThreadRng) -> World {
+    let radius_planet = 6371.0;
     let planet = Sphere {
-        center: Vector3d { x: 0.0, y: -3000.0, z: 0.0 },
-        radius: 3000.0,
+        center: Vector3d { x: 0.0, y: -radius_planet, z: 0.0 },
+        radius: radius_planet,
         material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
     };
     let mut objects = (0..200).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
@@ -76,7 +77,6 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     return Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus);
 }
 
-// todo: spheres have dark border. Is this right?
 fn main() {
     //let pixel_scale = 1;
     //let samples_per_pixel = 1024;
@@ -85,6 +85,7 @@ fn main() {
     let pixel_scale = 4;
     let samples_per_pixel = 4;
     let max_depth = 4;
+
     let t_step = 0.2;
 
     let rng = rand::thread_rng();

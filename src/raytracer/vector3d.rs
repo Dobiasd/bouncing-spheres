@@ -21,6 +21,7 @@ impl fmt::Display for Vector3d {
 }
 
 impl Vector3d {
+    #[inline(always)]
     pub fn length_squared(&self) -> f64 {
         return self.x * self.x + self.y * self.y + self.z * self.z;
     }
@@ -31,6 +32,7 @@ impl Vector3d {
 
 impl Add<&Vector3d> for Vector3d {
     type Output = Vector3d;
+    #[inline(always)]
     fn add(self, other: &Vector3d) -> Vector3d {
         Vector3d { x: self.x + other.x, y: self.y + other.y, z: self.z + other.z }
     }
@@ -38,6 +40,7 @@ impl Add<&Vector3d> for Vector3d {
 
 impl Sub<&Vector3d> for Vector3d {
     type Output = Vector3d;
+    #[inline(always)]
     fn sub(self, other: &Vector3d) -> Vector3d {
         Vector3d { x: self.x - other.x, y: self.y - other.y, z: self.z - other.z }
     }
@@ -45,6 +48,7 @@ impl Sub<&Vector3d> for Vector3d {
 
 impl Mul<f64> for Vector3d {
     type Output = Vector3d;
+    #[inline(always)]
     fn mul(self, t: f64) -> Vector3d {
         return Vector3d { x: self.x * t, y: self.y * t, z: self.z * t };
     }
@@ -52,6 +56,7 @@ impl Mul<f64> for Vector3d {
 
 impl Mul<&Vector3d> for Vector3d {
     type Output = Vector3d;
+    #[inline(always)]
     fn mul(self, other: &Vector3d) -> Vector3d {
         return Vector3d { x: self.x * other.x, y: self.y * other.y, z: self.z * other.z };
     }
@@ -59,15 +64,18 @@ impl Mul<&Vector3d> for Vector3d {
 
 impl Div<f64> for Vector3d {
     type Output = Vector3d;
+    #[inline(always)]
     fn div(self, t: f64) -> Vector3d {
         return Vector3d { x: self.x / t, y: self.y / t, z: self.z / t };
     }
 }
 
+#[inline(always)]
 pub fn dot(a: &Vector3d, b: &Vector3d) -> f64 {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
+#[inline(always)]
 pub fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
     return Vector3d {
         x: a.y * b.z - a.z * b.y,
@@ -76,10 +84,12 @@ pub fn cross(a: &Vector3d, b: &Vector3d) -> Vector3d {
     };
 }
 
+#[inline(always)]
 pub fn unit_vector(v: &Vector3d) -> Vector3d {
     return *v / v.length();
 }
 
+#[inline(always)]
 pub fn random_unit_vector(mut rng: ThreadRng) -> Vector3d {
     let a = rng.gen_range(0.0, 2.0 * PI);
     let z = rng.gen_range(-1.0 as f64, 1.0 as f64);
@@ -91,10 +101,12 @@ pub fn random_unit_vector(mut rng: ThreadRng) -> Vector3d {
     };
 }
 
+#[inline(always)]
 pub fn reflect(v: &Vector3d, n: &Vector3d) -> Vector3d {
     return *v - &((*n * dot(v, n)) * 2.0 as f64);
 }
 
+#[inline(always)]
 pub fn random_in_unit_disk(mut rng: ThreadRng) -> Vector3d {
     let mut p = Vector3d {
         x: rng.gen_range(-1.0, 1.0),
