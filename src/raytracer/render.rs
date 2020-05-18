@@ -5,20 +5,20 @@ use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
 use crate::raytracer::image::Image;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::sphere::SphereWorld;
+use crate::raytracer::world::World;
 use crate::raytracer::vector3d::unit_vector;
 
-fn ray_color(rng: ThreadRng, r: &Ray, spheres: &SphereWorld, depth: usize) -> Color {
+fn ray_color(rng: ThreadRng, r: &Ray, world: &World, depth: usize) -> Color {
     if depth <= 0 {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
     let t_min = 0.001;
     let t_max = 99999999.9;
-    match spheres.hit(r, t_min, t_max) {
+    match world.hit(r, t_min, t_max) {
         Some(rec) => {
             return match rec.material.scatter(rng, &r, &rec) {
                 Some((scattered, attenuation)) => {
-                    attenuation * &ray_color(rng, &scattered, spheres, depth - 1)
+                    attenuation * &ray_color(rng, &scattered, world, depth - 1)
                 }
                 None => Color { r: 0.0, g: 0.0, b: 0.0 }
             };
@@ -35,7 +35,7 @@ fn ray_color(rng: ThreadRng, r: &Ray, spheres: &SphereWorld, depth: usize) -> Co
 
 pub fn render(mut rng: ThreadRng, width: usize, height: usize,
               samples_per_pixel: usize, max_depth: usize,
-              world: &SphereWorld, cam: &Camera) -> Image {
+              world: &World, cam: &Camera) -> Image {
     let mut image = Image::new(width, height);
 
     for y in 0..height {

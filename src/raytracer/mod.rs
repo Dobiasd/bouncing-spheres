@@ -7,3 +7,4 @@ pub mod ray;
 pub mod render;
 pub mod sphere;
 pub mod vector3d;
+pub mod world;

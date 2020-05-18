@@ -11,7 +11,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let oc = r.origin - &self.center;
         let a = r.direction.length_squared();
         let half_b = dot(&oc, &r.direction);
@@ -49,26 +49,5 @@ impl Sphere {
             }
         }
         return None;
-    }
-}
-
-pub struct SphereWorld {
-    pub spheres: Vec<Sphere>
-}
-
-impl SphereWorld {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        let mut closest_so_far = t_max;
-        let mut rec: Option<Hit> = None;
-        for sphere in &self.spheres {
-            match sphere.hit(r, t_min, closest_so_far) {
-                Some(temp_rec) => {
-                    closest_so_far = temp_rec.t;
-                    rec = Some(temp_rec);
-                }
-                None => {}
-            }
-        }
-        return rec;
     }
 }

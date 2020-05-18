@@ -14,7 +14,8 @@ use rand::prelude::*;
 use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
-use crate::raytracer::sphere::{Sphere, SphereWorld};
+use crate::raytracer::sphere::Sphere;
+use crate::raytracer::world::World;
 use crate::raytracer::vector3d::Vector3d;
 
 mod raytracer;
@@ -42,14 +43,14 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
     }
 }
 
-fn make_world(rng: ThreadRng) -> SphereWorld {
+fn make_world(rng: ThreadRng) -> World {
     let planet = Sphere {
         center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
         radius: 300.0,
         material: Material { albedo: Color { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
     };
     let objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
-    SphereWorld {
+    World {
         spheres: [&objects[..], &vec![planet][..]].concat()
     }
 }
@@ -81,7 +82,7 @@ fn main() {
     //let samples_per_pixel = 1024;
     //let max_depth = 64;
 
-    let pixel_scale = 16;
+    let pixel_scale = 8;
     let samples_per_pixel = 32;
     let max_depth = 16;
     let t_step = 0.2;
