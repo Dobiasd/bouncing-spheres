@@ -46,14 +46,15 @@ pub fn render(width: usize, height: usize,
         let mut rng = rand::thread_rng();
         let mut image_row = Image::new(width, 1);
         for x in 0..width {
-            let mut pixel_color = Color { r: 0.0, g: 0.0, b: 0.0 };
-            for _ in 0..samples_per_pixel {
-                let u = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
-                let v = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
-                let ray = cam.get_ray(rng, u, v);
-                pixel_color = pixel_color + &ray_color(rng, &ray, &world, max_depth, sky_factor);
-            }
-            image_row.set(x, 0, pixel_color.sqrt() / (samples_per_pixel as f64).sqrt());
+            let color_sum: Color = (0..samples_per_pixel).map(|_| {
+                let ray = cam.get_ray(
+                    rng,
+                    (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0),
+                    (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0));
+                ray_color(rng, &ray, &world, max_depth, sky_factor)
+            }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
+                    |a: Color, b: Color| a + &b);
+            image_row.set(x, 0, color_sum.sqrt() / (samples_per_pixel as f64).sqrt());
         }
         image_row
     }).collect();
