@@ -5,8 +5,8 @@ use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
 use crate::raytracer::image::Image;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::world::World;
 use crate::raytracer::vector3d::unit_vector;
+use crate::raytracer::world::World;
 
 fn ray_color(rng: ThreadRng, r: &Ray, world: &World, depth: usize) -> Color {
     if depth <= 0 {

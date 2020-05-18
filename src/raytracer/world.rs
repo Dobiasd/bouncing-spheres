@@ -1,6 +1,6 @@
-use crate::raytracer::sphere::Sphere;
-use crate::raytracer::ray::Ray;
 use crate::raytracer::hit::Hit;
+use crate::raytracer::ray::Ray;
+use crate::raytracer::sphere::Sphere;
 
 pub struct World {
     pub spheres: Vec<Sphere>
