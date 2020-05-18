@@ -10,42 +10,38 @@ pub struct Sphere {
     pub material: Material,
 }
 
-impl Sphere {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        let oc = r.origin - &self.center;
-        let a = r.direction.length_squared();
-        let half_b = dot(&oc, &r.direction);
-        let c = oc.length_squared() - self.radius * self.radius;
-        let discriminant = half_b * half_b - a * c;
+fn is_in_interval(x: f64, min: f64, max: f64) -> bool {
+    x > min && x < max
+}
 
+impl Sphere {
+    fn calculate_hit(&self, r: &Ray, t: f64) -> Hit {
+        let p = r.at(t);
+        let outward_normal = (p - &self.center) / self.radius;
+        let (front_face, normal) = face_normal(r, &outward_normal);
+        return Hit {
+            position: p,
+            t,
+            normal,
+            front_face,
+            material: self.material,
+        };
+    }
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+        let ray_origin_to_center = r.origin - &self.center;
+        let day_direction_squared_length = r.direction.length_squared();
+        let half_b = dot(&ray_origin_to_center, &r.direction);
+        let c = ray_origin_to_center.length_squared() - self.radius * self.radius;
+        let discriminant = half_b * half_b - day_direction_squared_length * c;
         if discriminant > 0.0 {
             let root = discriminant.sqrt();
-            let temp = (-half_b - root) / a;
-            // todo: remove duplication of these two blocks
-            if temp < t_max && temp > t_min {
-                let p = r.at(temp);
-                let outward_normal = (p - &self.center) / self.radius;
-                let (front_face, normal) = face_normal(r, &outward_normal);
-                return Some(Hit {
-                    position: p,
-                    t: temp,
-                    normal,
-                    front_face,
-                    material: self.material,
-                });
+            let t_front = (-half_b - root) / day_direction_squared_length;
+            if is_in_interval(t_front, t_min, t_max) {
+                return Some(self.calculate_hit(r, t_front));
             }
-            let temp2 = (-half_b + root) / a;
-            if temp2 < t_max && temp2 > t_min {
-                let p = r.at(temp2);
-                let outward_normal = (p - &self.center) / self.radius;
-                let (front_face, normal) = face_normal(r, &outward_normal);
-                return Some(Hit {
-                    position: p,
-                    t: temp2,
-                    normal,
-                    front_face,
-                    material: self.material,
-                });
+            let t_back = (-half_b + root) / day_direction_squared_length;
+            if is_in_interval(t_back, t_min, t_max) {
+                return Some(self.calculate_hit(r, t_back));
             }
         }
         return None;

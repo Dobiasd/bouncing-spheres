@@ -38,7 +38,7 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
                 b: rng.gen_range(0.0, 1.0),
             },
             reflectiveness: (rng.gen_range(0.0, 3.0) as f64).min(1.0),
-            fuzz: (rng.gen_range(-3.0, 1.0) as f64).max(0.0),
+            reflection_fuzz: (rng.gen_range(-3.0, 1.0) as f64).max(0.0),
         },
     }
 }
@@ -47,7 +47,7 @@ fn make_world(rng: ThreadRng) -> World {
     let planet = Sphere {
         center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
         radius: 300.0,
-        material: Material { albedo: Color { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
+        material: Material { albedo: Color { r: 0.3, g: 0.7, b: 0.2 }, reflectiveness: 0.0, reflection_fuzz: 0.0 },
     };
     let objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
     World {

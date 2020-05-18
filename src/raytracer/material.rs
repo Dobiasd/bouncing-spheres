@@ -10,7 +10,7 @@ use crate::raytracer::vector3d::{dot, random_unit_vector, reflect, unit_vector};
 pub struct Material {
     pub albedo: Color,
     pub reflectiveness: f64,
-    pub fuzz: f64,
+    pub reflection_fuzz: f64,
 }
 
 impl Material {
@@ -23,7 +23,7 @@ impl Material {
             let reflected = reflect(&unit_vector(&ray.direction), &rec.normal);
             let scattered = Ray {
                 origin: rec.position,
-                direction: reflected + &(random_unit_vector(rng) * self.fuzz),
+                direction: reflected + &(random_unit_vector(rng) * self.reflection_fuzz),
             };
             if dot(&scattered.direction, &rec.normal) > 0.0 {
                 Some((scattered, self.albedo))
