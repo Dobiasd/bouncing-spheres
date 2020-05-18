@@ -92,7 +92,7 @@ pub fn random_unit_vector(mut rng: ThreadRng) -> Vector3d {
 }
 
 pub fn reflect(v: &Vector3d, n: &Vector3d) -> Vector3d {
-    return *v - &(((*n * dot(v, n))) * 2.0 as f64);
+    return *v - &((*n * dot(v, n)) * 2.0 as f64);
 }
 
 pub fn random_in_unit_disk(mut rng: ThreadRng) -> Vector3d {

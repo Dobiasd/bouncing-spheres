@@ -1,4 +1,4 @@
-use crate::raytracer::hitrecord::{face_normal, HitRecord};
+use crate::raytracer::hit::{face_normal, Hit};
 use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{dot, Vector3d};
@@ -10,14 +10,14 @@ pub struct Sphere {
     pub material: Material,
 }
 
-pub struct HittableSpheres {
+pub struct SphereWorld {
     pub spheres: Vec<Sphere>
 }
 
-impl HittableSpheres {
-    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl SphereWorld {
+    pub fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
         let mut closest_so_far = t_max;
-        let mut rec: Option<HitRecord> = None;
+        let mut rec: Option<Hit> = None;
         for sphere in &self.spheres {
             match hit_sphere(&sphere.center, sphere.radius, r, &sphere.material, t_min, closest_so_far) {
                 Some(temp_rec) => {
@@ -32,7 +32,7 @@ impl HittableSpheres {
 }
 
 // todo: make method
-fn hit_sphere(center: &Vector3d, radius: f64, r: &Ray, mat: &Material, t_min: f64, t_max: f64) -> Option<HitRecord> {
+fn hit_sphere(center: &Vector3d, radius: f64, r: &Ray, mat: &Material, t_min: f64, t_max: f64) -> Option<Hit> {
     let oc = r.origin - center;
     let a = r.direction.length_squared();
     let half_b = dot(&oc, &r.direction);
@@ -47,8 +47,8 @@ fn hit_sphere(center: &Vector3d, radius: f64, r: &Ray, mat: &Material, t_min: f6
             let p = r.at(temp);
             let outward_normal = (p - center) / radius;
             let (front_face, normal) = face_normal(r, &outward_normal);
-            return Some(HitRecord {
-                p,
+            return Some(Hit {
+                position: p,
                 t: temp,
                 normal,
                 front_face,
@@ -60,8 +60,8 @@ fn hit_sphere(center: &Vector3d, radius: f64, r: &Ray, mat: &Material, t_min: f6
             let p = r.at(temp2);
             let outward_normal = (p - center) / radius;
             let (front_face, normal) = face_normal(r, &outward_normal);
-            return Some(HitRecord {
-                p,
+            return Some(Hit {
+                position: p,
                 t: temp2,
                 normal,
                 front_face,

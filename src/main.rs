@@ -7,13 +7,14 @@ use std::time::SystemTime;
 
 use chrono::DateTime;
 use chrono::offset::Utc;
-use pixel_canvas::{Canvas, Color};
+use pixel_canvas::Canvas;
+use pixel_canvas::Color as CanvasColor;
 use rand::prelude::*;
 
 use crate::raytracer::camera::Camera;
-use crate::raytracer::floatcolor::FloatColor;
+use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
-use crate::raytracer::sphere::{HittableSpheres, Sphere};
+use crate::raytracer::sphere::{Sphere, SphereWorld};
 use crate::raytracer::vector3d::Vector3d;
 
 mod raytracer;
@@ -30,7 +31,7 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
         },
         radius,
         material: Material {
-            albedo: FloatColor {
+            albedo: Color {
                 r: rng.gen_range(0.0, 1.0),
                 g: rng.gen_range(0.0, 1.0),
                 b: rng.gen_range(0.0, 1.0),
@@ -41,14 +42,14 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
     }
 }
 
-fn make_world(rng: ThreadRng) -> HittableSpheres {
+fn make_world(rng: ThreadRng) -> SphereWorld {
     let planet = Sphere {
         center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
         radius: 300.0,
-        material: Material { albedo: FloatColor { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
+        material: Material { albedo: Color { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
     };
     let objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
-    HittableSpheres {
+    SphereWorld {
         spheres: [&objects[..], &vec![planet][..]].concat()
     }
 }
@@ -56,21 +57,21 @@ fn make_world(rng: ThreadRng) -> HittableSpheres {
 fn cam(width: usize, height: usize, t: f64) -> Camera {
     let speed = 0.5;
     let dist = 12.5;
-    let lookfrom = Vector3d {
+    let position = Vector3d {
         x: dist * (speed * t).sin(),
         y: 5.0 + 4.5 * (0.4 * t).cos(),
         z: dist * (speed * t).cos(),
     };
-    let lookat = Vector3d {
+    let looks_at = Vector3d {
         x: 1.3 * (0.2 * t).cos(),
         y: 1.3 * (0.34 * t).cos(),
         z: 1.3 * (0.41 * t).cos(),
     };
     let vup = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
-    let dist_to_focus = (lookfrom - &lookat).length();
+    let dist_to_focus = (position - &looks_at).length();
     let aperture = 0.0;
     let aspect_ratio = width as f64 / height as f64;
-    return Camera::new(&lookfrom, &lookat, &vup, 90.0, aspect_ratio, aperture, dist_to_focus);
+    return Camera::new(&position, &looks_at, &vup, 90.0, aspect_ratio, aperture, dist_to_focus);
 }
 
 // todo: spheres have dark border. Is this right?
@@ -112,7 +113,7 @@ fn main() {
                 let r = (c.r.max(0.0).min(1.0) * 255.0) as u8;
                 let g = (c.g.max(0.0).min(1.0) * 255.0) as u8;
                 let b = (c.b.max(0.0).min(1.0) * 255.0) as u8;
-                *pixel = Color { r, g, b }
+                *pixel = CanvasColor { r, g, b }
             }
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));

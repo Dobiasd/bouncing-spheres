@@ -2,28 +2,31 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-use crate::raytracer::floatcolor::FloatColor;
+use crate::raytracer::color::Color;
 
-pub struct FloatImage {
-    data: Vec<FloatColor>,
+pub struct Image {
+    data: Vec<Color>,
     width: usize,
     height: usize,
 }
 
-impl FloatImage {
-    pub fn new(width: usize, height: usize) -> FloatImage {
-        FloatImage {
-            data: vec![FloatColor { r: 0.0, g: 0.0, b: 0.0 }; width * height],
+impl Image {
+    pub fn new(width: usize, height: usize) -> Image {
+        Image {
+            data: vec![Color { r: 0.0, g: 0.0, b: 0.0 }; width * height],
             width,
             height,
         }
     }
-    pub fn get(&self, x: usize, y: usize) -> &FloatColor {
+
+    pub fn get(&self, x: usize, y: usize) -> &Color {
         return &self.data[y * self.width + x];
     }
-    pub fn set(&mut self, x: usize, y: usize, c: FloatColor) {
+
+    pub fn set(&mut self, x: usize, y: usize, c: Color) {
         self.data[y * self.width + x] = c;
     }
+
     pub fn save_png(&self, path: &Path) {
         let file = File::create(path).unwrap();
         let ref mut w = BufWriter::new(file);
