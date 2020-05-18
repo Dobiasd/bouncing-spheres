@@ -79,13 +79,13 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 // todo: spheres have dark border. Is this right?
 // todo: multi core
 fn main() {
-    //let pixel_scale = 2;
+    //let pixel_scale = 1;
     //let samples_per_pixel = 1024;
     //let max_depth = 64;
 
     let pixel_scale = 8;
-    let samples_per_pixel = 32;
-    let max_depth = 16;
+    let samples_per_pixel = 8;
+    let max_depth = 4;
     let t_step = 0.2;
 
     let rng = rand::thread_rng();
@@ -107,7 +107,7 @@ fn main() {
         let width = image.width() as usize;
         let height = image.height() as usize;
         let pixels = raytracer::render::render(
-            rng, width / pixel_scale, height / pixel_scale,
+            width / pixel_scale, height / pixel_scale,
             samples_per_pixel, max_depth, &world, &cam(width, height, t));
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {

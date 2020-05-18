@@ -1,5 +1,6 @@
 use rand::prelude::ThreadRng;
 use rand::Rng;
+use rayon::prelude::*;
 
 use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
@@ -35,12 +36,13 @@ fn ray_color(rng: ThreadRng, r: &Ray, world: &World, depth: usize) -> Color {
     return col1 * (1.0 - t) + &(col2 * t);
 }
 
-pub fn render(mut rng: ThreadRng, width: usize, height: usize,
+pub fn render(width: usize, height: usize,
               samples_per_pixel: usize, max_depth: usize,
               world: &World, cam: &Camera) -> Image {
     let mut image = Image::new(width, height);
-
-    for y in 0..height {
+    let image_rows: Vec<Image> = (0..height).into_par_iter().map(|y| {
+        let mut rng = rand::thread_rng();
+        let mut image_row = Image::new(width, 1);
         for x in 0..width {
             let mut pixel_color = Color { r: 0.0, g: 0.0, b: 0.0 };
             for _ in 0..samples_per_pixel {
@@ -49,7 +51,13 @@ pub fn render(mut rng: ThreadRng, width: usize, height: usize,
                 let r = cam.get_ray(rng, u, v);
                 pixel_color = pixel_color + &ray_color(rng, &r, &world, max_depth);
             }
-            image.set(x, y, pixel_color.sqrt() / (samples_per_pixel as f64).sqrt());
+            image_row.set(x, 0, pixel_color.sqrt() / (samples_per_pixel as f64).sqrt());
+        }
+        image_row
+    }).collect();
+    for y in 0..height {
+        for x in 0..width {
+            image.set(x, y, *image_rows[y].get(x, 0));
         }
     }
     return image;
