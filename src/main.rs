@@ -6,7 +6,7 @@ extern crate serde_derive;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
-use std::ops::{Add, Div};
+use std::ops::{Add, Div, Mul};
 use std::path::Path;
 use std::prelude::v1::Vec;
 use std::process::Command;
@@ -71,9 +71,9 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
         z: dist * (0.17 * t).cos(),
     };
     let looks_at = Vector3d {
-        x: 5.3 * (0.21 * t).cos(),
+        x: 7.3 * (0.21 * t).cos(),
         y: 2.3 * (0.34 * t).cos(),
-        z: 5.3 * (0.41 * t).cos(),
+        z: 7.3 * (0.41 * t).cos(),
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_focus = (position - &looks_at).length();
@@ -156,11 +156,13 @@ fn main() {
     let mut frame_num = 0;
     canvas.render(move |_, image| {
         t += config.speed / 60.0;
+        let sky_factor = 0.3 + 0.7 * t.mul(0.2).cos();
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
             image.height() / config.display_scale_factor,
             config.samples_per_pixel, config.max_depth, &world,
-            &cam(image.width(), image.height(), t));
+            &cam(image.width(), image.height(), t),
+            sky_factor);
         let width = image.width();
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
