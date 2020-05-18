@@ -1,6 +1,11 @@
 extern crate chrono;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 
 use std::fs;
+use std::fs::File;
+use std::io::Read;
 use std::ops::{Add, Div};
 use std::path::Path;
 use std::prelude::v1::Vec;
@@ -76,14 +81,24 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus)
 }
 
-fn main() {
-    //let pixel_scale = 1;
-    //let samples_per_pixel = 1024;
-    //let max_depth = 64;
+#[derive(Debug, Deserialize)]
+struct Config {
+    pixel_scale: usize,
+    samples_per_pixel: usize,
+    max_depth: usize,
+}
 
-    let pixel_scale = 8;
-    let samples_per_pixel = 4;
-    let max_depth = 4;
+fn init() -> Config {
+    let config_path = "raytracer.toml";
+    let mut config_file_content = String::new();
+    File::open(config_path).and_then(|mut f| {
+        f.read_to_string(&mut config_file_content)
+    }).expect(&format!("Unable to read config file: {}", config_path));
+    toml::from_str(&config_file_content).expect(&format!("Unable to parse config file: {}", config_path))
+}
+
+fn main() {
+    let config = init();
 
     let speed = 2.3;
     let t_step = speed * 1.0 / 60.0;
@@ -107,11 +122,11 @@ fn main() {
         let width = image.width() as usize;
         let height = image.height() as usize;
         let pixels = raytracer::render::render(
-            width / pixel_scale, height / pixel_scale,
-            samples_per_pixel, max_depth, &world, &cam(width, height, t));
+            width / config.pixel_scale, height / config.pixel_scale,
+            config.samples_per_pixel, config.max_depth, &world, &cam(width, height, t));
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
-                *pixel = pixels.get(x / pixel_scale, y / pixel_scale).to_canvas_color()
+                *pixel = pixels.get(x / config.pixel_scale, y / config.pixel_scale).to_canvas_color()
             }
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));

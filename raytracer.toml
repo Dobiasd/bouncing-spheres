@@ -1,0 +1,9 @@
+# Very slow but very nice
+#pixel_scale = 1
+#samples_per_pixel = 1024
+#max_depth = 64
+
+# Fast and ugly
+pixel_scale = 8
+samples_per_pixel = 4
+max_depth = 4
