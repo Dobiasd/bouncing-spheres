@@ -12,10 +12,8 @@ pub struct Vector3d {
     pub z: f64,
 }
 
-// Similarly, implement `Display` for `Point2D`
 impl fmt::Display for Vector3d {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // Customize so only `x` and `y` are denoted.
         write!(f, "x: {}, y: {}, z: {}", self.x, self.y, self.z)
     }
 }

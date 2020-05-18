@@ -15,7 +15,7 @@ fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize) -> Color {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
     let t_min = 0.001;
-    let t_max = 99999999.9;
+    let t_max = 9999999999.9;
     match world.hit(ray, t_min, t_max) {
         Some(rec) => {
             return match rec.material.scatter(rng, &ray, &rec) {

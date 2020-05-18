@@ -29,19 +29,16 @@ impl Image {
 
     pub fn save_png(&self, path: &Path) {
         let file = File::create(path).unwrap();
-        let ref mut w = BufWriter::new(file);
-
-        let mut encoder = png::Encoder::new(w, self.width as u32, self.height as u32);
+        let mut encoder =
+            png::Encoder::new(BufWriter::new(file),
+                              self.width as u32, self.height as u32);
         encoder.set_color(png::ColorType::RGB);
         encoder.set_depth(png::BitDepth::Eight);
         let mut writer = encoder.write_header().unwrap();
         let png_data = (0..self.height).map(|y| {
             (0..self.width).map(|x| {
-                let c = self.get(x, self.height - y - 1);
-                let r = (c.r.max(0.0).min(1.0) * 255.0) as u8;
-                let g = (c.g.max(0.0).min(1.0) * 255.0) as u8;
-                let b = (c.b.max(0.0).min(1.0) * 255.0) as u8;
-                vec![r, g, b]
+                let c = self.get(x, self.height - y - 1).to_canvas_color();
+                vec![c.r, c.g, c.b]
             }).collect::<Vec<Vec<u8>>>().concat()
         }).collect::<Vec<Vec<u8>>>().concat();
         writer.write_image_data(&png_data).unwrap();

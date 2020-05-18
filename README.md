@@ -1,3 +1,17 @@
-https://raytracing.github.io/books/RayTracingInOneWeekend.html
+# Raytracer
 
-ffmpeg -r 50 -i images/%08d.png -vcodec libx264 -preset veryslow -qp 0 video.mp4
+A very simple raytracer based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html), implemented in Rust.
+
+# Compile and run
+
+```bash
+RUSTFLAGS="-C target-cpu=native" cargo run --release --package raytracer --bin main
+```
+
+You'll find an `image` directory with a bunch of `.png` files in it.
+
+# Generate video from images
+
+```bash
+ffmpeg -i images/[DIR_NAME]/%08d.png -c:v libx264 -preset slow -profile:v high -crf 18 -coder 1 -pix_fmt yuv420p -movflags +faststart -g 60 -bf 2 video.mp4
+```

@@ -58,12 +58,11 @@ fn make_world(rng: ThreadRng) -> World {
 }
 
 fn cam(width: usize, height: usize, t: f64) -> Camera {
-    let speed = 0.5;
     let dist = 12.5;
     let position = Vector3d {
-        x: dist * (speed * 0.23 * t).sin(),
+        x: dist * (0.11 * t).sin(),
         y: 5.0 + 4.999 * (0.4 * t).cos(),
-        z: dist * (speed * 0.31 * t).cos(),
+        z: dist * (0.17 * t).cos(),
     };
     let looks_at = Vector3d {
         x: 5.3 * (0.21 * t).cos(),
@@ -86,7 +85,8 @@ fn main() {
     let samples_per_pixel = 4;
     let max_depth = 4;
 
-    let t_step = 0.2;
+    let speed = 2.3;
+    let t_step = speed * 1.0 / 60.0;
 
     let rng = rand::thread_rng();
     let world = make_world(rng);
