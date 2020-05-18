@@ -56,6 +56,8 @@ fn make_world(rng: ThreadRng) -> World {
         radius: radius_planet,
         material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
     };
+
+    // todo: solve without mutation: https://stackoverflow.com/questions/61871089/how-to-concatenate-vectors-without-cloning-the-objects
     let mut objects = (0..200).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
     objects.extend(vec![planet]);
     World {
