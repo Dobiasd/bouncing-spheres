@@ -15,8 +15,8 @@ use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
 use crate::raytracer::sphere::Sphere;
-use crate::raytracer::world::World;
 use crate::raytracer::vector3d::Vector3d;
+use crate::raytracer::world::World;
 
 mod raytracer;
 
@@ -27,7 +27,7 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
     Sphere {
         center: Vector3d {
             x: rng.gen_range(min, max),
-            y: radius + rng.gen_range(0.0, 2.0),
+            y: radius + rng.gen_range(-radius * 0.8, radius * 2.0),
             z: rng.gen_range(min, max),
         },
         radius,
