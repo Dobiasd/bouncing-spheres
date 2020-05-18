@@ -13,5 +13,5 @@ You'll find an `image` directory with a bunch of `.png` files in it.
 # Generate video from images
 
 ```bash
-ffmpeg -i images/[DIR_NAME]/%08d.png -c:v libx264 -preset slow -profile:v high -crf 18 -coder 1 -pix_fmt yuv420p -movflags +faststart -g 60 -bf 2 video.mp4
+ffmpeg -i ./images/[DIR_NAME]/%08d.png -c:v libx264 -preset slow -profile:v high -crf 18 -coder 1 -pix_fmt yuv420p -movflags +faststart -g 60 -bf 2 ./images/video.mp4
 ```

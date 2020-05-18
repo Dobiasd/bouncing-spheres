@@ -81,7 +81,7 @@ fn main() {
     //let samples_per_pixel = 1024;
     //let max_depth = 64;
 
-    let pixel_scale = 4;
+    let pixel_scale = 8;
     let samples_per_pixel = 4;
     let max_depth = 4;
 
@@ -91,13 +91,13 @@ fn main() {
     let rng = rand::thread_rng();
     let world = make_world(rng);
 
-    let canvas = Canvas::new(1280, 720)
+    let canvas = Canvas::new(1920, 1080)
         .title("raytracer");
 
     let start_time = SystemTime::now();
     let datetime: DateTime<Utc> = start_time.into();
 
-    let dir_path_str = format!("./images/{}/", datetime.format("%Y-%m-%dT%TZ"));
+    let dir_path_str = format!("./images/{}/", datetime.format("%Y-%m-%d_%H-%M-%S"));
     fs::create_dir_all(Path::new(&dir_path_str)).expect("wat");
 
     let mut t = 0.0;
