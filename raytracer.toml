@@ -1,9 +1,15 @@
-# Very slow but very nice
-#pixel_scale = 1
+# Very slow and very nice
+#resolution_x = 1920
+#resolution_y = 1080
 #samples_per_pixel = 1024
 #max_depth = 64
+#display_scale_factor = 1
+#speed = 2.3
 
 # Fast and ugly
-pixel_scale = 8
+resolution_x = 240
+resolution_y = 135
 samples_per_pixel = 4
 max_depth = 4
+display_scale_factor = 6
+speed = 2.3

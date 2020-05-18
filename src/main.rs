@@ -83,9 +83,12 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 
 #[derive(Debug, Deserialize)]
 struct Config {
-    pixel_scale: usize,
+    resolution_x: usize,
+    resolution_y: usize,
     samples_per_pixel: usize,
     max_depth: usize,
+    display_scale_factor: usize,
+    speed: f64,
 }
 
 fn init() -> Config {
@@ -100,14 +103,12 @@ fn init() -> Config {
 fn main() {
     let config = init();
 
-    let speed = 2.3;
-    let t_step = speed * 1.0 / 60.0;
-
     let rng = rand::thread_rng();
     let world = make_world(rng);
 
-    let canvas = Canvas::new(1920, 1080)
-        .title("raytracer");
+    let window_width = config.resolution_x * config.display_scale_factor;
+    let window_height = config.resolution_y * config.display_scale_factor;
+    let canvas = Canvas::new(window_width, window_height).title("raytracer");
 
     let start_time = SystemTime::now();
     let datetime: DateTime<Utc> = start_time.into();
@@ -118,15 +119,19 @@ fn main() {
     let mut t = 0.0;
     let mut frame_num = 0;
     canvas.render(move |_, image| {
-        t += t_step;
-        let width = image.width() as usize;
-        let height = image.height() as usize;
+        t += config.speed / 60.0;
         let pixels = raytracer::render::render(
-            width / config.pixel_scale, height / config.pixel_scale,
-            config.samples_per_pixel, config.max_depth, &world, &cam(width, height, t));
+            image.width() / config.display_scale_factor,
+            image.height() / config.display_scale_factor,
+            config.samples_per_pixel, config.max_depth, &world,
+            &cam(image.width(), image.height(), t));
+        let width = image.width();
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
-                *pixel = pixels.get(x / config.pixel_scale, y / config.pixel_scale).to_canvas_color()
+                *pixel = pixels.get(
+                    x / config.display_scale_factor,
+                    y / config.display_scale_factor,
+                ).to_canvas_color()
             }
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
