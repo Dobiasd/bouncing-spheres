@@ -18,5 +18,5 @@ pub fn face_normal(r: &Ray, outward_normal: &Vector3d) -> (bool, Vector3d) {
     } else {
         Vector3d { x: 0.0, y: 0.0, z: 0.0 } - &outward_normal
     };
-    return (front_face, normal);
+    (front_face, normal)
 }

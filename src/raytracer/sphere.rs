@@ -19,13 +19,13 @@ impl Sphere {
         let p = ray.at(t);
         let outward_normal = (p - &self.center) / self.radius;
         let (front_face, normal) = face_normal(ray, &outward_normal);
-        return Hit {
+        Hit {
             position: p,
             t,
             normal,
             front_face,
             material: &self.material,
-        };
+        }
     }
 
     #[inline(always)]
@@ -46,6 +46,6 @@ impl Sphere {
                 return Some(self.calculate_hit(ray, t_back));
             }
         }
-        return None;
+        None
     }
 }

@@ -20,7 +20,7 @@ impl Image {
     }
 
     pub fn get(&self, x: usize, y: usize) -> &Color {
-        return &self.data[y * self.width + x];
+        &self.data[y * self.width + x]
     }
 
     pub fn set(&mut self, x: usize, y: usize, c: Color) {

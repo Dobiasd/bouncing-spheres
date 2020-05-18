@@ -15,7 +15,7 @@ pub struct Material {
 impl Material {
     #[inline(always)]
     pub fn scatter(&self, mut rng: ThreadRng, ray: &Ray, rec: &Hit) -> Option<(Ray, Color)> {
-        return if rng.gen::<f64>() > self.reflectiveness {
+        if rng.gen::<f64>() > self.reflectiveness {
             let scatter_direction = rec.normal + &random_unit_vector(rng);
             let scattered = Ray { origin: rec.position, direction: scatter_direction };
             Some((scattered, self.albedo))
@@ -30,6 +30,6 @@ impl Material {
             } else {
                 None
             }
-        };
+        }
     }
 }

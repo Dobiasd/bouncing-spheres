@@ -8,6 +8,6 @@ pub struct Ray {
 impl Ray {
     #[inline(always)]
     pub fn at(&self, t: f64) -> Vector3d {
-        return self.origin + &(self.direction * t);
+        self.origin + &(self.direction * t)
     }
 }

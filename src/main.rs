@@ -73,7 +73,7 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     let dist_to_focus = (position - &looks_at).length();
     let aperture = 0.0;
     let aspect_ratio = width as f64 / height as f64;
-    return Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus);
+    Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus)
 }
 
 fn main() {

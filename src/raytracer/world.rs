@@ -19,6 +19,6 @@ impl World {
                 None => {}
             }
         }
-        return rec;
+        rec
     }
 }

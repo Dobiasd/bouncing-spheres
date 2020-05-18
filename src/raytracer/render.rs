@@ -31,7 +31,7 @@ fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize) -> Color {
     let blend = 0.5 * (unit_vector(&ray.direction).y + 1.0);
     let col1 = Color { r: 1.0, g: 1.0, b: 1.0 };
     let col2 = Color { r: 1.0, g: 0.1, b: 0.2 };
-    return col1 * (1.0 - blend) + &(col2 * blend);
+    col1 * (1.0 - blend) + &(col2 * blend)
 }
 
 pub fn render(width: usize, height: usize,
@@ -58,5 +58,5 @@ pub fn render(width: usize, height: usize,
             image.set(x, y, *image_rows[y].get(x, 0));
         }
     }
-    return image;
+    image
 }
