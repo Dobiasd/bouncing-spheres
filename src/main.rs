@@ -58,8 +58,7 @@ fn make_world(rng: ThreadRng) -> World {
 
     World {
         spheres: (0..200).map(|_| random_sphere(rng))
-            .into_iter()
-            .chain(vec![planet])
+            .chain(std::iter::once(planet))
             .collect()
     }
 }
