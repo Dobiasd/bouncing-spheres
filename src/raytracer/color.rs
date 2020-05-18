@@ -10,7 +10,7 @@ pub struct Color {
 }
 
 impl Color {
-    pub fn sqrt(&self) -> Color {
+    pub fn sqrt_gamma_correct(&self) -> Color {
         Color {
             r: self.r.sqrt(),
             g: self.g.sqrt(),

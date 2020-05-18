@@ -5,26 +5,14 @@ use std::path::Path;
 use crate::raytracer::color::Color;
 
 pub struct Image {
-    data: Vec<Color>,
-    width: usize,
-    height: usize,
+    pub data: Vec<Color>,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl Image {
-    pub fn new(width: usize, height: usize) -> Image {
-        Image {
-            data: vec![Color { r: 0.0, g: 0.0, b: 0.0 }; width * height],
-            width,
-            height,
-        }
-    }
-
     pub fn get(&self, x: usize, y: usize) -> &Color {
         &self.data[y * self.width + x]
-    }
-
-    pub fn set(&mut self, x: usize, y: usize, c: Color) {
-        self.data[y * self.width + x] = c;
     }
 
     pub fn save_png(&self, path: &Path) {

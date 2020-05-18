@@ -27,7 +27,6 @@ fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize, sky_factor:
         }
         None => {}
     }
-
     let day1 = Color { r: 1.0, g: 1.0, b: 1.0 };
     let day2 = Color { r: 0.5, g: 0.7, b: 1.0 };
     let night1 = Color { r: 0.8, g: 0.8, b: 0.8 };
@@ -41,27 +40,26 @@ fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize, sky_factor:
 pub fn render(width: usize, height: usize,
               samples_per_pixel: usize, max_depth: usize,
               world: &World, cam: &Camera, sky_factor: f64) -> Image {
-    let mut image = Image::new(width, height);
-    let image_rows: Vec<Image> = (0..height).into_par_iter().map(|y| {
-        let mut rng = rand::thread_rng();
-        let mut image_row = Image::new(width, 1);
-        for x in 0..width {
-            let color_sum: Color = (0..samples_per_pixel).map(|_| {
-                let ray = cam.get_ray(
-                    rng,
-                    (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0),
-                    (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0));
-                ray_color(rng, &ray, &world, max_depth, sky_factor)
-            }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
-                    |a: Color, b: Color| a + &b);
-            image_row.set(x, 0, color_sum.sqrt() / (samples_per_pixel as f64).sqrt());
-        }
-        image_row
-    }).collect();
-    for y in 0..height {
-        for x in 0..width {
-            image.set(x, y, *image_rows[y].get(x, 0));
-        }
+    Image {
+        data: (0..height).into_par_iter().map(|y| {
+            let mut rng = rand::thread_rng();
+            (0..width).map(|x| {
+                (0..samples_per_pixel).map(|_| {
+                    let ray = cam.get_ray(
+                        rng,
+                        (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0),
+                        (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0));
+                    ray_color(rng, &ray, &world, max_depth, sky_factor)
+                }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
+                        |a: Color, b: Color| a + &b)
+            }).collect()
+        }).collect::<Vec<Vec<Color>>>()
+            .iter()
+            .flatten()
+            .map(|c| *c / samples_per_pixel as f64)
+            .map(|c| c.sqrt_gamma_correct())
+            .collect(),
+        width,
+        height,
     }
-    image
 }
