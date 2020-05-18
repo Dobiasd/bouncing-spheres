@@ -1,3 +1,6 @@
+extern crate chrono;
+
+use std::fs;
 use std::ops::{Add, Div, Mul, Sub};
 use std::path::Path;
 use std::prelude::v1::Vec;
@@ -6,6 +9,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use pixel_canvas::{Canvas, Color, input::MouseState};
 use rand::prelude::*;
 
+use chrono::DateTime;
+use chrono::offset::Utc;
 use raytracer::*;
 
 use crate::raytracer::camera::Camera;
@@ -74,9 +79,16 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
 // todo: spheres have dark border. Is this right?
 // todo: multi core
 fn main() {
-    let pixel_scale = 2;
-    let samples_per_pixel = 1024;
-    let max_depth = 64;
+    //let pixel_scale = 2;
+    //let samples_per_pixel = 1024;
+    //let max_depth = 64;
+
+    let pixel_scale = 16;
+    let samples_per_pixel = 32;
+    let max_depth = 16;
+    let t_step = 0.2;
+
+    let world = make_world(rng);
 
     let canvas = Canvas::new(1280, 720)
         .title("raytracer")
@@ -84,10 +96,15 @@ fn main() {
         .input(MouseState::handle_input);
     let mut rng = rand::thread_rng();
     let start_time = SystemTime::now();
-    let mut last_frame_start_time = start_time;
-    let world = make_world(rng);
+    let datetime: DateTime<Utc> = start_time.into();
+
+    let dir_path_str = format!("./images/{}/", datetime.format("%Y-%m-%dT%TZ"));
+    fs::create_dir_all(Path::new(&dir_path_str)).expect("wat");
+
+    let mut t = 0.0;
+    let mut frame_num = 0;
     canvas.render(move |mouse, image| {
-        let t = start_time.elapsed().expect("wat").as_millis() as f64 / 1000.0;
+        t += t_step;
         let width = image.width() as usize;
         let height = image.height() as usize;
         let pixels = raytracer::render::render(
@@ -102,15 +119,7 @@ fn main() {
                 *pixel = Color { r, g, b }
             }
         }
-        let frame_done_time = SystemTime::now();
-        let elapsed = frame_done_time.duration_since(last_frame_start_time);
-        last_frame_start_time = frame_done_time;
-
-        let since_the_epoch = frame_done_time.duration_since(UNIX_EPOCH).expect("Time went backwards");
-        let time_format = format!("{:?}", since_the_epoch);
-        let path_str = format!("./images/{}.png", time_format);
-        let path = Path::new(&path_str);
-        pixels.save_png(path);
-        println!("{}", elapsed.expect("wat").as_millis());
+        pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
+        frame_num += 1;
     });
 }

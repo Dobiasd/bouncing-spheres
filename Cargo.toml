@@ -8,6 +8,7 @@ edition = "2018"
 pixel-canvas = "0.2.1"
 rand = "0.7.3"
 png = "0.16.3"
+chrono = "0.4.11"
 
 [[bin]]
 name = "main"
