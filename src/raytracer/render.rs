@@ -4,12 +4,11 @@ use rand::Rng;
 use crate::raytracer::camera::Camera;
 use crate::raytracer::floatcolor::FloatColor;
 use crate::raytracer::floatimage::FloatImage;
-use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::sphere::{HittableSpheres, Sphere};
-use crate::raytracer::vector3d::{unit_vector, Vector3d};
+use crate::raytracer::sphere::HittableSpheres;
+use crate::raytracer::vector3d::unit_vector;
 
-fn ray_color(mut rng: ThreadRng, r: &Ray, spheres: &HittableSpheres, depth: usize) -> FloatColor {
+fn ray_color( rng: ThreadRng, r: &Ray, spheres: &HittableSpheres, depth: usize) -> FloatColor {
     if depth <= 0 {
         return FloatColor { r: 0.0, g: 0.0, b: 0.0 };
     }

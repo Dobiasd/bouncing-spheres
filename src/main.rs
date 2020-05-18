@@ -1,17 +1,14 @@
 extern crate chrono;
 
 use std::fs;
-use std::ops::{Add, Div, Mul, Sub};
 use std::path::Path;
 use std::prelude::v1::Vec;
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use pixel_canvas::{Canvas, Color, input::MouseState};
-use rand::prelude::*;
+use std::time::SystemTime;
 
 use chrono::DateTime;
 use chrono::offset::Utc;
-use raytracer::*;
+use pixel_canvas::{Canvas, Color};
+use rand::prelude::*;
 
 use crate::raytracer::camera::Camera;
 use crate::raytracer::floatcolor::FloatColor;
@@ -44,13 +41,13 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
     }
 }
 
-fn make_world(mut rng: ThreadRng) -> HittableSpheres {
+fn make_world(rng: ThreadRng) -> HittableSpheres {
     let planet = Sphere {
         center: Vector3d { x: 0.0, y: -300.0, z: 0.0 },
         radius: 300.0,
         material: Material { albedo: FloatColor { r: 0.5, g: 0.7, b: 0.2 }, reflectiveness: 0.0, fuzz: 0.0 },
     };
-    let objects = (0..32).map(|x| random_sphere(rng)).collect::<Vec<Sphere>>();
+    let objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
     HittableSpheres {
         spheres: [&objects[..], &vec![planet][..]].concat()
     }
@@ -88,13 +85,12 @@ fn main() {
     let max_depth = 16;
     let t_step = 0.2;
 
+    let rng = rand::thread_rng();
     let world = make_world(rng);
 
     let canvas = Canvas::new(1280, 720)
-        .title("raytracer")
-        .state(MouseState::new())
-        .input(MouseState::handle_input);
-    let mut rng = rand::thread_rng();
+        .title("raytracer");
+
     let start_time = SystemTime::now();
     let datetime: DateTime<Utc> = start_time.into();
 
@@ -103,7 +99,7 @@ fn main() {
 
     let mut t = 0.0;
     let mut frame_num = 0;
-    canvas.render(move |mouse, image| {
+    canvas.render(move |_, image| {
         t += t_step;
         let width = image.width() as usize;
         let height = image.height() as usize;

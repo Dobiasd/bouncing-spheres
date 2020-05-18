@@ -10,12 +10,12 @@ pub struct Camera {
     vertical: Vector3d,
     u: Vector3d,
     v: Vector3d,
-    w: Vector3d,
+    //w: Vector3d,
     lens_radius: f64,
 }
 
 impl Camera {
-    pub fn get_ray(&self, mut rng: ThreadRng, s: f64, t: f64) -> Ray {
+    pub fn get_ray(&self,  rng: ThreadRng, s: f64, t: f64) -> Ray {
         let rd = random_in_unit_disk(rng) * self.lens_radius;
         let offset = self.u * rd.x + &(self.v * rd.y);
         return Ray {
@@ -59,7 +59,7 @@ impl Camera {
             lower_left_corner,
             u,
             v,
-            w,
+            //w,
             lens_radius,
         };
     }

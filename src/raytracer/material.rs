@@ -4,7 +4,7 @@ use rand::Rng;
 use crate::raytracer::floatcolor::FloatColor;
 use crate::raytracer::hitrecord::HitRecord;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d::{dot, random_in_unit_sphere, random_unit_vector, reflect, unit_vector};
+use crate::raytracer::vector3d::{dot, random_unit_vector, reflect, unit_vector};
 
 #[derive(Copy, Clone)]
 pub struct Material {
@@ -24,7 +24,7 @@ impl Material {
 
             let scattered = Ray {
                 origin: rec.p,
-                direction: reflected + &(random_in_unit_sphere(rng) * self.fuzz),
+                direction: reflected + &(random_unit_vector(rng) * self.fuzz),
             };
             if dot(&scattered.direction, &rec.normal) > 0.0 {
                 Some((scattered, self.albedo))
