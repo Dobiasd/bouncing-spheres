@@ -28,6 +28,7 @@ impl Image {
     }
 
     pub fn save_png(&self, path: &Path) {
+        println!("Saving {}", path.display());
         let file = File::create(path).unwrap();
         let mut encoder =
             png::Encoder::new(BufWriter::new(file),

@@ -9,6 +9,7 @@ use std::io::Read;
 use std::ops::{Add, Div};
 use std::path::Path;
 use std::prelude::v1::Vec;
+use std::process::Command;
 use std::time::SystemTime;
 
 use chrono::DateTime;
@@ -81,6 +82,40 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
     Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus)
 }
 
+
+fn create_video(dir_path_str: &str) {
+    let video_path = format!("{}.mp4", dir_path_str);
+    println!("Saving {}", video_path);
+    let output = Command::new("ffmpeg")
+        .arg("-i")
+        .arg(format!("{}/%08d.png", dir_path_str))
+        .arg("-c:v")
+        .arg("libx264")
+        .arg("-preset")
+        .arg("slow")
+        .arg("-profile:v")
+        .arg("high")
+        .arg("-crf")
+        .arg("18")
+        .arg("-coder")
+        .arg("1")
+        .arg("-pix_fmt")
+        .arg("yuv420p")
+        .arg("-movflags")
+        .arg("+faststart")
+        .arg("-g")
+        .arg("60")
+        .arg("-bf")
+        .arg("2")
+        .arg("-y")
+        .arg(video_path)
+        .output()
+        .expect("failed to execute ffmpeg");
+    println!("{}", output.status);
+    println!("{}", std::str::from_utf8(&output.stderr[..]).expect("wat"));
+    println!("{}", std::str::from_utf8(&output.stdout[..]).expect("wat"));
+}
+
 #[derive(Debug, Deserialize)]
 struct Config {
     resolution_x: usize,
@@ -89,6 +124,7 @@ struct Config {
     max_depth: usize,
     display_scale_factor: usize,
     speed: f64,
+    num_frames: usize,
 }
 
 fn init() -> Config {
@@ -113,7 +149,7 @@ fn main() {
     let start_time = SystemTime::now();
     let datetime: DateTime<Utc> = start_time.into();
 
-    let dir_path_str = format!("./images/{}/", datetime.format("%Y-%m-%d_%H-%M-%S"));
+    let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
     fs::create_dir_all(Path::new(&dir_path_str)).expect("wat");
 
     let mut t = 0.0;
@@ -136,5 +172,9 @@ fn main() {
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
         frame_num += 1;
+        if frame_num >= config.num_frames {
+            create_video(&dir_path_str);
+            std::process::exit(0);
+        }
     });
 }

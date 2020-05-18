@@ -9,14 +9,8 @@ It can only do spheres and reflection, but no refraction, lights, etc.
 RUSTFLAGS="-C target-cpu=native" cargo run --release --package raytracer --bin main
 ```
 
-You'll find an `image` directory with a bunch of `.png` files in it.
-
-# Generate video from images
-
-```bash
-ffmpeg -i ./images/[DIR_NAME]/%08d.png -c:v libx264 -preset slow -profile:v high -crf 18 -coder 1 -pix_fmt yuv420p -movflags +faststart -g 60 -bf 2 ./images/video.mp4
-```
+When done, you'll find an `output` directory with a bunch of image (`.png`) files and (if `ffmpeg` is available) a video (`.mp4`) in it.
 
 # Render quality
 
-You can change the settings in  `raytracer.toml`.
+The settings can be changed in `raytracer.toml`.
