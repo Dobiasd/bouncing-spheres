@@ -1,4 +1,5 @@
 use std::ops::{Add, Div, Mul};
+use pixel_canvas::Color as CanvasColor;
 
 #[derive(Copy, Clone)]
 pub struct Color {
@@ -14,6 +15,13 @@ impl Color {
             g: self.g.sqrt(),
             b: self.b.sqrt(),
         }
+    }
+
+    pub fn to_canvas_color(&self) -> CanvasColor {
+        let r = (self.r.max(0.0).min(1.0) * 255.0) as u8;
+        let g = (self.g.max(0.0).min(1.0) * 255.0) as u8;
+        let b = (self.b.max(0.0).min(1.0) * 255.0) as u8;
+        CanvasColor { r, g, b }
     }
 }
 

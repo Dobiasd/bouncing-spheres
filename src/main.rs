@@ -8,7 +8,6 @@ use std::time::SystemTime;
 use chrono::DateTime;
 use chrono::offset::Utc;
 use pixel_canvas::Canvas;
-use pixel_canvas::Color as CanvasColor;
 use rand::prelude::*;
 
 use crate::raytracer::camera::Camera;
@@ -17,13 +16,14 @@ use crate::raytracer::material::Material;
 use crate::raytracer::sphere::Sphere;
 use crate::raytracer::vector3d::Vector3d;
 use crate::raytracer::world::World;
+use std::ops::{Div, Add};
 
 mod raytracer;
 
 fn random_sphere(mut rng: ThreadRng) -> Sphere {
     let min = -10.0;
     let max = 10.0;
-    let radius = rng.gen_range(0.5, 1.5);
+    let radius = 0.4 + 1.8 * rng.gen_range(-6.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
     Sphere {
         center: Vector3d {
             x: rng.gen_range(min, max),
@@ -49,7 +49,7 @@ fn make_world(rng: ThreadRng) -> World {
         radius: 300.0,
         material: Material { albedo: Color { r: 0.3, g: 0.7, b: 0.2 }, reflectiveness: 0.0, reflection_fuzz: 0.0 },
     };
-    let mut objects = (0..32).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
+    let mut objects = (0..42).map(|_| random_sphere(rng)).collect::<Vec<Sphere>>();
     objects.extend(vec![planet]);
     World {
         spheres: objects
@@ -111,11 +111,7 @@ fn main() {
             samples_per_pixel, max_depth, &world, &cam(width, height, t));
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
-                let c = pixels.get(x / pixel_scale, y / pixel_scale);
-                let r = (c.r.max(0.0).min(1.0) * 255.0) as u8;
-                let g = (c.g.max(0.0).min(1.0) * 255.0) as u8;
-                let b = (c.b.max(0.0).min(1.0) * 255.0) as u8;
-                *pixel = CanvasColor { r, g, b }
+                *pixel = pixels.get(x / pixel_scale, y / pixel_scale).to_canvas_color()
             }
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
