@@ -14,7 +14,9 @@ use std::time::SystemTime;
 use chrono::DateTime;
 use chrono::offset::Utc;
 use pixel_canvas::Canvas;
-use rand::prelude::*;
+use rand::prelude::StdRng;
+use rand::Rng;
+use rand::SeedableRng;
 
 use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
@@ -25,7 +27,7 @@ use crate::raytracer::world::World;
 
 mod raytracer;
 
-fn random_sphere(mut rng: ThreadRng) -> Sphere {
+fn random_sphere(rng: &mut StdRng) -> Sphere {
     let min = -24.0;
     let max = 24.0;
     let radius = 0.4 + 1.8 * rng.gen_range(-12.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
@@ -48,7 +50,7 @@ fn random_sphere(mut rng: ThreadRng) -> Sphere {
     }
 }
 
-fn make_world(rng: ThreadRng) -> World {
+fn make_world(rng: &mut StdRng) -> World {
     let radius_planet = 6371.0;
     let planet = Sphere {
         center: Vector3d { x: 0.0, y: -radius_planet, z: 0.0 },
@@ -57,7 +59,7 @@ fn make_world(rng: ThreadRng) -> World {
     };
 
     World {
-        spheres: (0..200).map(|_| random_sphere(rng))
+        spheres: (0..200).map(move |_| random_sphere(rng))
             .chain(std::iter::once(planet))
             .collect()
     }
@@ -136,8 +138,8 @@ fn init() -> Config {
 fn main() {
     let config = init();
 
-    let rng = rand::thread_rng();
-    let world = make_world(rng);
+    let mut rng: StdRng = SeedableRng::seed_from_u64(42);
+    let world = make_world(&mut rng);
 
     let window_width = config.resolution_x * config.display_scale_factor;
     let window_height = config.resolution_y * config.display_scale_factor;

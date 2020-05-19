@@ -1,4 +1,4 @@
-use rand::prelude::ThreadRng;
+use rand::prelude::StdRng;
 
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{cross, random_in_unit_disk, unit_vector, Vector3d};
@@ -16,7 +16,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn get_ray(&self, rng: ThreadRng, s: f64, t: f64) -> Ray {
+    pub fn get_ray(&self, rng: &mut StdRng, s: f64, t: f64) -> Ray {
         let rd = random_in_unit_disk(rng) * self.lens_radius;
         let offset = self.u * rd.x + &(self.v * rd.y);
         Ray {

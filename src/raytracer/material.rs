@@ -1,4 +1,4 @@
-use rand::prelude::ThreadRng;
+use rand::prelude::StdRng;
 use rand::Rng;
 
 use crate::raytracer::color::Color;
@@ -14,7 +14,7 @@ pub struct Material {
 
 impl Material {
     #[inline(always)]
-    pub fn scatter(&self, mut rng: ThreadRng, ray: &Ray, rec: &Hit) -> Option<(Ray, Color)> {
+    pub fn scatter(&self, rng: &mut StdRng, ray: &Ray, rec: &Hit) -> Option<(Ray, Color)> {
         if rng.gen::<f64>() > self.reflectiveness {
             let scatter_direction = rec.normal + &random_unit_vector(rng);
             let scattered = Ray { origin: rec.position, direction: scatter_direction };

@@ -1,5 +1,5 @@
-use rand::prelude::ThreadRng;
-use rand::Rng;
+use rand::{Rng, SeedableRng};
+use rand::prelude::StdRng;
 use rayon::prelude::*;
 
 use crate::raytracer::camera::Camera;
@@ -10,7 +10,7 @@ use crate::raytracer::vector3d::unit_vector;
 use crate::raytracer::world::World;
 
 #[inline(always)]
-fn ray_color(rng: ThreadRng, ray: &Ray, world: &World, depth: usize, sky_factor: f64) -> Color {
+fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World, depth: usize, sky_factor: f64) -> Color {
     if depth <= 0 {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
@@ -42,14 +42,13 @@ pub fn render(width: usize, height: usize,
               world: &World, cam: &Camera, sky_factor: f64) -> Image {
     Image {
         data: (0..height).into_par_iter().map(|y| {
-            let mut rng = rand::thread_rng();
+            let mut rng: StdRng = SeedableRng::seed_from_u64(y as u64);
             (0..width).map(|x| {
                 (0..samples_per_pixel).map(|_| {
-                    let ray = cam.get_ray(
-                        rng,
-                        (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0),
-                        (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0));
-                    ray_color(rng, &ray, &world, max_depth, sky_factor)
+                    let s = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
+                    let t = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
+                    let ray = cam.get_ray(&mut rng, s, t);
+                    ray_color(&mut rng, &ray, &world, max_depth, sky_factor)
                 }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
                         |a: Color, b: Color| a + &b)
             }).collect()

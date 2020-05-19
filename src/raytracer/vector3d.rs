@@ -2,7 +2,7 @@ use core::fmt;
 use std::f64::consts::PI;
 use std::ops::{Add, Div, Mul, Sub};
 
-use rand::prelude::ThreadRng;
+use rand::prelude::StdRng;
 use rand::Rng;
 
 #[derive(Copy, Clone)]
@@ -88,7 +88,7 @@ pub fn unit_vector(v: &Vector3d) -> Vector3d {
 }
 
 #[inline(always)]
-pub fn random_unit_vector(mut rng: ThreadRng) -> Vector3d {
+pub fn random_unit_vector(rng: &mut StdRng) -> Vector3d {
     let a = rng.gen_range(0.0, 2.0 * PI);
     let z = rng.gen_range(-1.0 as f64, 1.0 as f64);
     let r = (1.0 - z * z).sqrt();
@@ -105,7 +105,7 @@ pub fn reflect(v: &Vector3d, n: &Vector3d) -> Vector3d {
 }
 
 #[inline(always)]
-pub fn random_in_unit_disk(mut rng: ThreadRng) -> Vector3d {
+pub fn random_in_unit_disk(rng: &mut StdRng) -> Vector3d {
     let mut p = Vector3d {
         x: rng.gen_range(-1.0, 1.0),
         y: rng.gen_range(-1.0, 1.0),
