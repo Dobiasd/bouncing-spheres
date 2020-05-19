@@ -86,8 +86,8 @@ fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
                     let move_dist = min_dist - dist;
                     let move_dir_a = unit_vector(&(a.center - &b.center));
                     let move_dir_b = unit_vector(&(b.center - &a.center));
-                    a.center = a.center + &(move_dir_a * move_dist * move_fraction_a) + &(move_dir_a * 0.0001);
-                    b.center = b.center + &(move_dir_b * move_dist * move_fraction_b) + &(move_dir_b * 0.0001);
+                    a.center = a.center + &(move_dir_a * move_dist * move_fraction_a) + &(move_dir_a * 0.00000001);
+                    b.center = b.center + &(move_dir_b * move_dist * move_fraction_b) + &(move_dir_b * 0.00000001);
                     // todo: use bounciness
                     change = true;
                 }

@@ -31,7 +31,7 @@ mod raytracer;
 fn random_sphere(rng: &mut StdRng) -> Sphere {
     let min = -4.0;
     let max = 4.0;
-    let radius = 0.4 + 1.8 * rng.gen_range(-12.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
+    let radius = 0.4 + 1.8 * rng.gen_range(-12.0_f64, 2.0_f64).tanh().add(1.0).div(2.0);
     Sphere {
         id: Uuid::new_v4(),
         center: Vector3d {
@@ -46,8 +46,8 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
                 g: rng.gen_range(0.0, 1.0),
                 b: rng.gen_range(0.0, 1.0),
             },
-            reflectiveness: (rng.gen_range(0.0, 3.0) as f64).min(1.0),
-            reflection_fuzz: (rng.gen_range(-3.0, 1.0) as f64).max(0.0),
+            reflectiveness: (rng.gen_range(0.0_f64, 3.0_f64)).min(1.0),
+            reflection_fuzz: (rng.gen_range(-3.0_f64, 1.0_f64)).max(0.0),
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius.powf(3.0),
@@ -73,16 +73,15 @@ fn make_world(rng: &mut StdRng) -> World {
 }
 
 fn cam(width: usize, height: usize, t: f64) -> Camera {
-    let dist = 12.5;
     let position = Vector3d {
-        x: dist * (0.11 * t).sin(),
+        x: 12.5 * (0.11 * t).sin(),
         y: 5.0 + 4.999 * (0.4 * t).cos(),
-        z: dist * (0.17 * t).cos(),
+        z: 12.5 * (0.17 * t).cos(),
     };
     let looks_at = Vector3d {
-        x: 7.3 * (0.21 * t).cos(),
-        y: 2.3 * (0.34 * t).cos(),
-        z: 7.3 * (0.41 * t).cos(),
+        x: 7.3 * (0.21 * t).sin(),
+        y: 0.61 * (0.34 * t).sin(),
+        z: 7.3 * (0.41 * t).sin(),
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_focus = (position - &looks_at).length();
