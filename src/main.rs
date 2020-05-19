@@ -17,6 +17,7 @@ use pixel_canvas::Canvas;
 use rand::prelude::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
+use uuid::Uuid;
 
 use crate::raytracer::camera::Camera;
 use crate::raytracer::color::Color;
@@ -28,13 +29,14 @@ use crate::raytracer::world::World;
 mod raytracer;
 
 fn random_sphere(rng: &mut StdRng) -> Sphere {
-    let min = -24.0;
-    let max = 24.0;
+    let min = -4.0;
+    let max = 4.0;
     let radius = 0.4 + 1.8 * rng.gen_range(-12.0 as f64, 2.0 as f64).tanh().add(1.0).div(2.0);
     Sphere {
+        id: Uuid::new_v4(),
         center: Vector3d {
             x: rng.gen_range(min, max),
-            y: radius,
+            y: rng.gen_range(radius, 38.0),
             z: rng.gen_range(min, max),
         },
         radius,
@@ -47,15 +49,20 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
             reflectiveness: (rng.gen_range(0.0, 3.0) as f64).min(1.0),
             reflection_fuzz: (rng.gen_range(-3.0, 1.0) as f64).max(0.0),
         },
+        speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
+        mass: radius.powf(3.0),
     }
 }
 
 fn make_world(rng: &mut StdRng) -> World {
     let radius_planet = 6371.0;
     let planet = Sphere {
+        id: Uuid::new_v4(),
         center: Vector3d { x: 0.0, y: -radius_planet, z: 0.0 },
         radius: radius_planet,
         material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
+        speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
+        mass: radius_planet.powf(3.0),
     };
 
     World {
@@ -139,7 +146,7 @@ fn main() {
     let config = init();
 
     let mut rng: StdRng = SeedableRng::seed_from_u64(42);
-    let world = make_world(&mut rng);
+    let mut world = make_world(&mut rng);
 
     let window_width = config.resolution_x * config.display_scale_factor;
     let window_height = config.resolution_y * config.display_scale_factor;
@@ -152,9 +159,11 @@ fn main() {
     fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
 
     let mut t = 0.0;
+    let t_step = config.speed / 60.0;
     let mut frame_num = 0;
     canvas.render(move |_, image| {
-        t += config.speed / 60.0;
+        t += t_step;
+        world = world.advance(t_step);
         let sky_factor = 0.3 + 0.7 * t.mul(0.2).cos();
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,

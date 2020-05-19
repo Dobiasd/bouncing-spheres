@@ -20,13 +20,9 @@ The settings can be changed in `raytracer.toml`.
 
 # todo
 
+- Add bouncing to physics
 - Light sources
-- Add bouncing physics
-    - metal spheres have higher mass
-    - center of planet as gravity target
 - Motion blur
-- Let spheres light up (and get non-reflective) when bouncing according to acceleration
+- Let spheres light up (and get non-reflective) when bouncing according to magnitude of change of speed
 - Speed up camera during the animation, sigmoid(t)
 - Slow down physics during the animation
-
-

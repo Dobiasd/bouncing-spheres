@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 chrono = "~0.4"
+itertools = "~0.9"
 pixel-canvas = "~0.2"
 png = "~0.16"
 rand = "~0.7"
@@ -13,6 +14,7 @@ rayon = "~1"
 serde = "~1"
 serde_derive = "~1"
 toml = "~0.5"
+uuid = { version = "~0.8", features = ["v4"] }
 
 [[bin]]
 name = "main"
