@@ -3,6 +3,8 @@
 A very simplistic raytracer implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html), .
 It can only do spheres and reflection, but no refraction, lights, etc.
 
+![example](example.png)
+
 # Compile and run
 
 ```bash
