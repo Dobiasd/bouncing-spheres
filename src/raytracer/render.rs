@@ -10,7 +10,8 @@ use crate::raytracer::vector3d::unit_vector;
 use crate::raytracer::world::World;
 
 #[inline(always)]
-fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World, depth: usize, sky_factor: f64) -> Color {
+fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
+             depth: usize, sky_factor: f64) -> Color {
     if depth <= 0 {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
@@ -20,7 +21,8 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World, depth: usize, sky_facto
         Some(rec) => {
             return match rec.material.scatter(rng, &ray, &rec) {
                 Some((scattered, attenuation)) => {
-                    attenuation * &ray_color(rng, &scattered, world, depth - 1, sky_factor)
+                    attenuation * &ray_color(rng, &scattered,
+                                             world, depth - 1, sky_factor)
                 }
                 None => Color { r: 0.0, g: 0.0, b: 0.0 }
             };
@@ -45,9 +47,10 @@ pub fn render(width: usize, height: usize,
             let mut rng: StdRng = SeedableRng::seed_from_u64(y as u64);
             (0..width).map(|x| {
                 (0..samples_per_pixel).map(|_| {
-                    let s = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
-                    let t = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
-                    let ray = get_ray_camera_blend(&mut rng, s, t, cam_old, cam);
+                    let horizontal_fraction = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
+                    let vertical_fraction = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
+                    let ray = get_ray_camera_blend(
+                        &mut rng, horizontal_fraction, vertical_fraction, cam_old, cam);
                     ray_color(&mut rng, &ray, &world, max_depth, sky_factor)
                 }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
                         |a: Color, b: Color| a + &b)

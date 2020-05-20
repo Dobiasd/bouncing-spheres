@@ -33,7 +33,8 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
     let min = -5.0;
     let max = 5.0;
     let max_start_y = 123.0;
-    let radius = 0.4 + 1.7 * rng.gen_range(-10.0_f64, 0.9_f64).tanh().add(1.0).div(2.0);
+    let radius = 0.4 + 1.7 *
+        rng.gen_range(-10.0_f64, 0.9_f64).tanh().add(1.0).div(2.0);
     let center = Vector3d {
         x: rng.gen_range(min, max),
         y: rng.gen_range(radius, max_start_y),
@@ -66,7 +67,11 @@ fn make_world(rng: &mut StdRng) -> World {
         id: Uuid::new_v4(),
         center,
         radius: radius_planet,
-        material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
+        material: Material {
+            albedo: Color { r: 0.5, g: 0.5, b: 0.5 },
+            reflectiveness: 1.0,
+            reflection_fuzz: 0.0,
+        },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
         extra_brightness: 0.0,
@@ -101,7 +106,8 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
     let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;
 
-    Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
+    Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view,
+                aspect_ratio, aperture, dist_to_focus)
 }
 
 
@@ -151,7 +157,8 @@ fn init() -> Config {
     File::open(config_path).and_then(|mut f| {
         f.read_to_string(&mut config_file_content)
     }).expect(&format!("Unable to read config file: {}", config_path));
-    toml::from_str(&config_file_content).expect(&format!("Unable to parse config file: {}", config_path))
+    toml::from_str(&config_file_content)
+        .expect(&format!("Unable to parse config file: {}", config_path))
 }
 
 fn main() {
@@ -167,7 +174,8 @@ fn main() {
     let datetime: DateTime<Utc> = SystemTime::now().into();
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
     if config.export {
-        fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
+        fs::create_dir_all(Path::new(&dir_path_str))
+            .expect(&format!("Can not create output directory: {}", dir_path_str));
     }
 
     let num_frames = 960;
@@ -195,7 +203,8 @@ fn main() {
             }
         }
         if config.export {
-            pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
+            pixels.save_png(&Path::new(&dir_path_str)
+                .join(format!("{:08}.png", frame_num)));
         } else {
             println!("Frame {} of {}", frame_num, num_frames)
         }

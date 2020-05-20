@@ -16,11 +16,14 @@ pub struct Camera {
     w: Vector3d,
 }
 
-pub fn get_ray_camera_blend(rng: &mut StdRng, s: f64, t: f64, cam_a: &Camera, cam_b: &Camera) -> Ray {
+pub fn get_ray_camera_blend(rng: &mut StdRng,
+                            horizontal_fraction: f64, vertical_fraction: f64,
+                            cam_a: &Camera, cam_b: &Camera) -> Ray {
     let frame_time = rng.gen_range(0.0_f64, 1.0_f64);
-    let rd = random_in_unit_disk(rng) * (frame_time * cam_b.lens_radius + (1.0 - frame_time) * cam_a.lens_radius);
-    let ray_a = cam_a.get_ray_rd(s, t, rd, frame_time);
-    let ray_b = cam_b.get_ray_rd(s, t, rd, frame_time);
+    let rd = random_in_unit_disk(rng) *
+        (frame_time * cam_b.lens_radius + (1.0 - frame_time) * cam_a.lens_radius);
+    let ray_a = cam_a.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
+    let ray_b = cam_b.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
     Ray {
         origin: (ray_b.origin * frame_time + &(ray_a.origin * (1.0 - frame_time))),
         direction: (ray_b.direction * frame_time + &(ray_a.direction * (1.0 - frame_time))),
@@ -29,11 +32,14 @@ pub fn get_ray_camera_blend(rng: &mut StdRng, s: f64, t: f64, cam_a: &Camera, ca
 }
 
 impl Camera {
-    pub fn get_ray_rd(&self, s: f64, t: f64, rd: Vector3d, frame_time: f64) -> Ray {
+    pub fn get_ray_rd(&self, horizontal_fraction: f64, vertical_fraction: f64,
+                      rd: Vector3d, frame_time: f64) -> Ray {
         let offset = self.u * rd.x + &(self.v * rd.y);
         Ray {
             origin: self.origin + &offset,
-            direction: self.lower_left_corner + &(self.horizontal * s) + &(self.vertical * t) - &self.origin - &offset,
+            direction: self.lower_left_corner +
+                &(self.horizontal * horizontal_fraction) +
+                &(self.vertical * vertical_fraction) - &self.origin - &offset,
             frame_time,
         }
     }
@@ -60,7 +66,8 @@ impl Camera {
         let origin = *position;
         let horizontal = u * viewport_width * focus_dist;
         let vertical = v * viewport_height * focus_dist;
-        let lower_left_corner = origin - &(horizontal / 2.0) - &(vertical / 2.0) - &(w * focus_dist);
+        let lower_left_corner =
+            origin - &(horizontal / 2.0) - &(vertical / 2.0) - &(w * focus_dist);
         let lens_radius = aperture / 2.0;
 
         Camera {
