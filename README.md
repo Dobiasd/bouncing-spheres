@@ -14,7 +14,6 @@ Features:
 
 Things it does not have:
 - Refraction
-- Lights
 - Fog
 - Textures
 - Any interesting objects
