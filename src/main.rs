@@ -6,7 +6,7 @@ extern crate serde_derive;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
-use std::ops::{Add, Div, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 use std::path::Path;
 use std::process::Command;
 use std::time::SystemTime;
@@ -29,10 +29,10 @@ use crate::raytracer::world::World;
 mod raytracer;
 
 fn random_sphere(rng: &mut StdRng) -> Sphere {
-    let min = -4.0;
-    let max = 4.0;
-    let max_start_y = 143.0;
-    let radius = 0.4 + 1.8 * rng.gen_range(-12.0_f64, 2.0_f64).tanh().add(1.0).div(2.0);
+    let min = -5.0;
+    let max = 5.0;
+    let max_start_y = 23.0;
+    let radius = 0.4 + 1.7 * rng.gen_range(-10.0_f64, 0.9_f64).tanh().add(1.0).div(2.0);
     Sphere {
         id: Uuid::new_v4(),
         center: Vector3d {
@@ -51,7 +51,7 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
             reflection_fuzz: (rng.gen_range(-3.0_f64, 1.0_f64)).max(0.0),
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
-        mass: radius.powf(3.0),
+        mass: radius.powf(3.0)
     }
 }
 
@@ -66,38 +66,37 @@ fn make_world(rng: &mut StdRng) -> World {
         mass: radius_planet.powf(3.0),
     };
 
-    // todo: 200
-    let number_of_spheres = 100;
+    let number_of_spheres = 80;
     World {
         spheres: (0..number_of_spheres).map(move |_| random_sphere(rng))
             .chain(std::iter::once(planet))
             .collect()
     }
+
 }
 
-fn cam(width: usize, height: usize, t: f64) -> Camera {
+fn cam(width: usize, height: usize, t_world: f64) -> Camera {
+    let t_cam = t_world.mul(4.0).sub(2.0).tanh().add(1.0).div(2.0);
+    println!("t_cam {}", t_cam); // todo remove
     let position = Vector3d {
-        x: 12.5 * (0.11 * t).sin(),
-        y: 5.0 + 4.999 * (0.4 * t).cos(),
-        z: 12.5 * (0.17 * t).cos(),
+        x: 12.5 * (6.1 * t_cam).sin(),
+        y: 0.1 + 8.1 * t_cam.mul(-1.0).add(1.0),
+        z: 12.5 * (4.7 * t_cam).cos(),
     };
     let looks_at = Vector3d {
-        x: 7.3 * (0.21 * t).sin(),
-        y: 0.61 * (0.34 * t).sin(),
-        z: 7.3 * (0.41 * t).sin(),
+        x: 1.3 * (7.1 * t_cam).sin(),
+        y: position.y.div(4.3),
+        z: 1.3 * (8.1 * t_cam).cos(),
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_looks_at = (position - &looks_at).length();
-    let dist_to_focus = dist_to_looks_at + 0.1 * (0.74 * t).sin();
-    let aperture = 0.0;
-    //let aperture = 0.28; // todo enable
+    let dist_to_focus = dist_to_looks_at + 0.1 * (0.74 * t_cam).sin();
+    let aperture = 0.28;
     let aspect_ratio = width as f64 / height as f64;
-    let vertical_field_of_view = 80.0 + 10.0 * (0.54 * t).sin();
-    // todo: enable
-    //Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
+    let vertical_field_of_view = 80.0;
 
-
-    Camera::new(&Vector3d { x: 0.0, y: 2.0, z: 10.0 }, &Vector3d { x: 0.0, y: 0.0, z: 0.0 }, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
+    //Camera::new(&Vector3d { x: 0.0, y: 2.0, z: 10.0 }, &Vector3d { x: 0.0, y: 0.0, z: 0.0 }, &up_direction, 80.0, aspect_ratio, 0.0, dist_to_focus)
+    Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
 }
 
 
@@ -138,8 +137,6 @@ struct Config {
     samples_per_pixel: usize,
     max_depth: usize,
     display_scale_factor: usize,
-    speed: f64,
-    num_frames: usize,
 }
 
 fn init() -> Config {
@@ -167,12 +164,13 @@ fn main() {
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
     fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
 
-    let mut t = 0.0;
-    let t_step = config.speed / 60.0;
+    let num_frames = 960;
     let mut frame_num = 0;
     canvas.render(move |_, image| {
-        t += t_step;
-        world = world.advance(t_step);
+        let t = frame_num as f64 / num_frames as f64;
+        //println!("t {}", t); // todo remove
+        world = world.advance(1.0 / num_frames as f64);
+        println!("{}", world.spheres[0].speed); // todo remove
         let sky_factor = 0.3 + 0.7 * t.mul(0.2).cos();
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
@@ -191,7 +189,7 @@ fn main() {
         }
         pixels.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
         frame_num += 1;
-        if frame_num >= config.num_frames {
+        if frame_num >= num_frames {
             create_video(&dir_path_str);
             std::process::exit(0);
         }

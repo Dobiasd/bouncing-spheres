@@ -12,7 +12,7 @@ pub struct Sphere {
     pub radius: f64,
     pub material: Material,
     pub speed: Vector3d,
-    pub mass: f64,
+    pub mass: f64
 }
 
 impl Sphere {

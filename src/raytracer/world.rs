@@ -31,13 +31,13 @@ impl World {
         World {
             spheres:
             move_positions(&friction(&solve_non_overlapping_constraint(&bounce(&gravitate(
-                &self.spheres, delta_t)))), delta_t)
+                &self.spheres, delta_t))), delta_t), delta_t)
         }
     }
 }
 
 fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let gravity_constant = 0.0013;
+    let gravity_constant = 0.73;
     spheres
         .iter()
         .map(|sphere| {
@@ -65,8 +65,8 @@ fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 }
 
 fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
-    let bounciness = 0.53;
-    let fixed_loss = 0.61;
+    let bounciness = 0.5;
+    let round_to_zero_threshold = 20.0; // Avoid infinite bouncing.
     let mut spheres_copy = spheres.to_vec();
     let new_spheres = spheres_copy.iter_mut()
         .map(|s| RefCell::new(s))
@@ -79,18 +79,17 @@ fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
             let dist = diff.length();
             let min_dist = a.radius + b.radius;
             if dist < min_dist {
-                let dir_b_to_a = unit_vector(&(a.center - &b.center));
                 let dir_a_to_b = unit_vector(&(b.center - &a.center));
                 let v_a_c_length = dot(&a.speed, &dir_a_to_b);
-                let v_b_c_length = dot(&b.speed, &dir_b_to_a);
+                let v_b_c_length = dot(&b.speed, &dir_a_to_b);
                 let v_a_c = dir_a_to_b * v_a_c_length;
-                let v_b_c = dir_b_to_a * v_b_c_length;
+                let v_b_c = dir_a_to_b * v_b_c_length;
                 let v_a_c_prime_length = (a.mass * v_a_c_length + b.mass * v_b_c_length - b.mass * (v_a_c_length - v_b_c_length) * bounciness) / (a.mass + b.mass);
                 let v_b_c_prime_length = (b.mass * v_b_c_length + a.mass * v_a_c_length - a.mass * (v_b_c_length - v_a_c_length) * bounciness) / (a.mass + b.mass);
-                let v_a_c_prime = dir_a_to_b * zero_in(fixed_loss, v_a_c_prime_length);
-                let v_b_c_prime = dir_b_to_a * zero_in(fixed_loss, v_b_c_prime_length);
-                a.speed = a.speed + &v_a_c_prime - &v_a_c;
-                b.speed = b.speed + &v_b_c_prime - &v_b_c;
+                let v_a_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_a_c_prime_length);
+                let v_b_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_b_c_prime_length);
+                a.speed = a.speed - &v_a_c + &v_a_c_prime;
+                b.speed = b.speed - &v_b_c + &v_b_c_prime;
             }
         }
     });
@@ -161,16 +160,15 @@ fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     }).collect()
 }
 
-fn friction(spheres: &Vec<Sphere>) -> Vec<Sphere> {
-    let friction = 0.98;
-    // todo squared
+fn friction(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
+    let friction = 12.1;
     spheres.iter().map(|sphere| {
         Sphere {
             id: sphere.id,
             center: sphere.center,
             radius: sphere.radius,
             material: sphere.material,
-            speed: sphere.speed * friction,
+            speed: sphere.speed - &(sphere.speed * delta_t * friction),
             mass: sphere.mass,
         }
     }).collect()

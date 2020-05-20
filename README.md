@@ -1,8 +1,22 @@
 # Raytracer
 
-A very simplistic raytracer implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html), .
-It can only do spheres, reflection and depth of field, but no refraction, fog, textures, etc.
-Also there are no optimizations like bounding volume hierarchy, etc., just brute-force tracing all the rays. 
+A very simplistic raytracer with some rudimentary physics - implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
+
+Features:
+- Spheres as the only type of object
+- Lambertian surfaces
+- Reflections
+- Depth of field
+- Some hardcoded initial conditions and camera movements
+- Display and export as images and video
+
+Things it does not have:
+- Refraction
+- Fog
+- Textures
+- Any interesting objects
+- Optimizations like bounding volume hierarchies
+- All the countless other cool things good raytracers can do
 
 ![example](example.png)
 
@@ -20,9 +34,6 @@ The settings can be changed in `raytracer.toml`.
 
 # todo
 
-- Add bouncing to physics
 - Light sources
 - Motion blur
 - Let spheres light up (and get non-reflective) when bouncing according to magnitude of change of speed
-- Speed up camera during the animation, sigmoid(t)
-- Slow down physics during the animation
