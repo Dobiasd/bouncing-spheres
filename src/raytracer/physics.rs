@@ -124,9 +124,13 @@ pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 
 pub fn friction(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     let friction = 12.1;
+    let deceleration_factor = delta_t * friction;
+    // Something like the following would be a more realistic representation of air resistance:
+    // let deceleration_factor = delta_t * friction * sphere.radius.powf(2.0) / sphere.mass.powf(3.0);
+    // But the other version looks nicer in the animation.
     spheres.iter().map(|sphere| {
         Sphere {
-            speed: sphere.speed - &(sphere.speed * delta_t * friction),
+            speed: sphere.speed - &(sphere.speed * deceleration_factor),
             ..*sphere
         }
     }).collect()
