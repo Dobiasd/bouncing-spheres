@@ -120,3 +120,16 @@ pub fn random_in_unit_disk(rng: &mut StdRng) -> Vector3d {
     }
     p
 }
+
+
+pub fn is_in_interval(x: f64, min: f64, max: f64) -> bool {
+    x > min && x < max
+}
+
+pub fn zero_in(dist_to_zero: f64, x: f64) -> f64 {
+    if is_in_interval(x, -dist_to_zero, dist_to_zero) {
+        0.0
+    } else {
+        x
+    }
+}

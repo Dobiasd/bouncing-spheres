@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::raytracer::hit::{face_normal, Hit};
 use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d::{dot, Vector3d};
+use crate::raytracer::vector3d::{dot, is_in_interval, Vector3d};
 
 #[derive(Copy, Clone)]
 pub struct Sphere {
@@ -13,10 +13,6 @@ pub struct Sphere {
     pub material: Material,
     pub speed: Vector3d,
     pub mass: f64,
-}
-
-fn is_in_interval(x: f64, min: f64, max: f64) -> bool {
-    x > min && x < max
 }
 
 impl Sphere {

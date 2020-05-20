@@ -31,12 +31,13 @@ mod raytracer;
 fn random_sphere(rng: &mut StdRng) -> Sphere {
     let min = -4.0;
     let max = 4.0;
+    let max_start_y = 143.0;
     let radius = 0.4 + 1.8 * rng.gen_range(-12.0_f64, 2.0_f64).tanh().add(1.0).div(2.0);
     Sphere {
         id: Uuid::new_v4(),
         center: Vector3d {
             x: rng.gen_range(min, max),
-            y: rng.gen_range(radius, 38.0),
+            y: rng.gen_range(radius, max_start_y),
             z: rng.gen_range(min, max),
         },
         radius,
