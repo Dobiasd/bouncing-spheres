@@ -7,6 +7,7 @@ Features:
 - Lambertian surfaces
 - Reflections
 - Depth of field
+- Motion blur
 - Rudimentary physics (gravity and elastic collisions)
 - Some hardcoded initial conditions and camera movements
 - Display and export as images and video
@@ -33,7 +34,3 @@ When done, you'll find an `output` directory with a bunch of image (`.png`) file
 # Render quality
 
 The settings can be changed in `raytracer.toml`.
-
-# todo
-
-- Split physics and rendering code

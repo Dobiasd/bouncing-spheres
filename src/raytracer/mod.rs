@@ -3,6 +3,7 @@ pub mod color;
 pub mod hit;
 pub mod image;
 pub mod material;
+pub mod physics;
 pub mod ray;
 pub mod render;
 pub mod sphere;

@@ -101,7 +101,6 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
     let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;
 
-    //Camera::new(&Vector3d { x: 0.0, y: 1.0, z: 0.1 }, &Vector3d { x: 0.0, y: 1.0, z: 0.0 }, &up_direction, 80.0, aspect_ratio, 0.0, dist_to_focus)
     Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
 }
 
