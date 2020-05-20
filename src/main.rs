@@ -77,7 +77,6 @@ fn make_world(rng: &mut StdRng) -> World {
 
 fn cam(width: usize, height: usize, t_world: f64) -> Camera {
     let t_cam = t_world.mul(4.0).sub(2.0).tanh().add(1.0).div(2.0);
-    println!("t_cam {}", t_cam); // todo remove
     let position = Vector3d {
         x: 12.5 * (6.1 * t_cam).sin(),
         y: 0.1 + 8.1 * t_cam.mul(-1.0).add(1.0),
@@ -168,9 +167,7 @@ fn main() {
     let mut frame_num = 0;
     canvas.render(move |_, image| {
         let t = frame_num as f64 / num_frames as f64;
-        //println!("t {}", t); // todo remove
         world = world.advance(1.0 / num_frames as f64);
-        println!("{}", world.spheres[0].speed); // todo remove
         let sky_factor = 0.3 + 0.7 * t.mul(0.2).cos();
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
