@@ -69,8 +69,8 @@ fn make_world(rng: &mut StdRng) -> World {
         radius: radius_planet,
         material: Material {
             albedo: Color { r: 0.5, g: 0.5, b: 0.5 },
-            reflectiveness: 1.0,
-            reflection_fuzz: 0.0,
+            reflectiveness: 0.7,
+            reflection_fuzz: 0.4,
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
@@ -87,7 +87,7 @@ fn make_world(rng: &mut StdRng) -> World {
 }
 
 fn cam(width: usize, height: usize, t_world: f64) -> Camera {
-    let t_cam = t_world.mul(5.0).sub(2.2).tanh().add(1.0).div(2.0);
+    let t_cam = t_world.mul(5.0).sub(2.3).tanh().add(1.0).div(2.0);
     let position = Vector3d {
         x: 15.0 * (7.1 * t_cam).sin(),
         y: 0.1 + 8.1 * t_cam.mul(-1.0).add(1.0),
@@ -180,13 +180,17 @@ fn main() {
 
     let num_frames = 960;
     let mut frame_num = 0;
+    let mut t_world = 0.0;
+    let mut t_world_old = 0.0;
     canvas.render(move |_, image| {
-        let t = frame_num as f64 / num_frames as f64;
-        let let_t_old = (frame_num - 1) as f64 / num_frames as f64;
-        world = world.advance(1.0 / num_frames as f64);
-        let sky_factor = t;
-        let cam_new = cam(image.width(), image.height(), t);
-        let cam_old = cam(image.width(), image.height(), let_t_old);
+        let t_real = frame_num as f64 / num_frames as f64;
+        let time_old = (frame_num - 1) as f64 / num_frames as f64;
+        t_world_old = t_world;
+        t_world = t_real - (50.0 * (t_real - 0.417)).tanh() / 50.0 - 0.02;
+        world = world.advance(t_world - t_world_old);
+        let sky_factor = t_real;
+        let cam_new = cam(image.width(), image.height(), t_real);
+        let cam_old = cam(image.width(), image.height(), time_old);
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
             image.height() / config.display_scale_factor,
