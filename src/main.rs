@@ -3,6 +3,7 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
+use std::f64::consts::PI;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
@@ -33,13 +34,14 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
     let max = 5.0;
     let max_start_y = 123.0;
     let radius = 0.4 + 1.7 * rng.gen_range(-10.0_f64, 0.9_f64).tanh().add(1.0).div(2.0);
+    let center = Vector3d {
+        x: rng.gen_range(min, max),
+        y: rng.gen_range(radius, max_start_y),
+        z: rng.gen_range(min, max),
+    };
     Sphere {
         id: Uuid::new_v4(),
-        center: Vector3d {
-            x: rng.gen_range(min, max),
-            y: rng.gen_range(radius, max_start_y),
-            z: rng.gen_range(min, max),
-        },
+        center,
         radius,
         material: Material {
             albedo: Color {
@@ -53,19 +55,22 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius.powf(3.0),
         extra_brightness: 0.0,
+        center_old: center,
     }
 }
 
 fn make_world(rng: &mut StdRng) -> World {
     let radius_planet = 6371.0;
+    let center = Vector3d { x: 0.0, y: -radius_planet, z: 0.0 };
     let planet = Sphere {
         id: Uuid::new_v4(),
-        center: Vector3d { x: 0.0, y: -radius_planet, z: 0.0 },
+        center,
         radius: radius_planet,
         material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
         extra_brightness: 0.0,
+        center_old: center,
     };
 
     let number_of_spheres = 80;
@@ -88,7 +93,8 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
         y: position.y.sqrt().div(4.0),
         z: 0.3 * (8.1 * t_cam).cos(),
     };
-    let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
+    let v_rotation = t_world.mul(40.0).sub(20.0).tanh().add(1.0).mul(PI);
+    let up_direction = Vector3d { x: 0.0, y: v_rotation.cos(), z: v_rotation.sin() };
     let dist_to_looks_at = (position - &looks_at).length();
     let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(4.0);
     let aperture = 0.15;
@@ -163,7 +169,9 @@ fn main() {
     let datetime: DateTime<Utc> = start_time.into();
 
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
-    fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
+    if config.export {
+        fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
+    }
 
     let num_frames = 960;
     let mut frame_num = 0;

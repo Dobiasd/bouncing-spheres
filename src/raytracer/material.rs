@@ -18,13 +18,18 @@ impl Material {
     pub fn scatter(&self, rng: &mut StdRng, ray: &Ray, rec: &Hit) -> Option<(Ray, Color)> {
         if rng.gen::<f64>() > self.reflectiveness {
             let scatter_direction = rec.normal + &random_unit_vector(rng);
-            let scattered = Ray { origin: rec.position, direction: scatter_direction };
+            let scattered = Ray {
+                origin: rec.position,
+                direction: scatter_direction,
+                frame_time: ray.frame_time,
+            };
             Some((scattered, self.albedo))
         } else {
             let reflected = reflect(&unit_vector(&ray.direction), &rec.normal);
             let scattered = Ray {
                 origin: rec.position,
                 direction: reflected + &(random_unit_vector(rng) * self.reflection_fuzz),
+                frame_time: ray.frame_time,
             };
             if dot(&scattered.direction, &rec.normal) > 0.0 {
                 Some((scattered, self.albedo))

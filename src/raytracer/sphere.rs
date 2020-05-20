@@ -14,13 +14,14 @@ pub struct Sphere {
     pub speed: Vector3d,
     pub mass: f64,
     pub extra_brightness: f64,
+    pub center_old: Vector3d,
 }
 
 impl Sphere {
     #[inline(always)]
-    fn calculate_hit(&self, ray: &Ray, t: f64) -> Hit {
+    fn calculate_hit(&self, ray: &Ray, t: f64, center: &Vector3d) -> Hit {
         let p = ray.at(t);
-        let outward_normal = (p - &self.center) / self.radius;
+        let outward_normal = (p - &center) / self.radius;
         let (front_face, normal) = face_normal(ray, &outward_normal);
         Hit {
             position: p,
@@ -37,7 +38,8 @@ impl Sphere {
 
     #[inline(always)]
     pub fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-        let ray_origin_to_center = ray.origin - &self.center;
+        let frame_time_center = self.center_at_frame_time(ray.frame_time);
+        let ray_origin_to_center = ray.origin - &frame_time_center;
         let day_direction_squared_length = ray.direction.length_squared();
         let half_b = dot(&ray_origin_to_center, &ray.direction);
         let c = ray_origin_to_center.length_squared() - self.radius * self.radius;
@@ -46,13 +48,18 @@ impl Sphere {
             let root = discriminant.sqrt();
             let t_front = (-half_b - root) / day_direction_squared_length;
             if is_in_interval(t_front, t_min, t_max) {
-                return Some(self.calculate_hit(ray, t_front));
+                return Some(self.calculate_hit(ray, t_front, &frame_time_center));
             }
             let t_back = (-half_b + root) / day_direction_squared_length;
             if is_in_interval(t_back, t_min, t_max) {
-                return Some(self.calculate_hit(ray, t_back));
+                return Some(self.calculate_hit(ray, t_back, &frame_time_center));
             }
         }
         None
+    }
+
+    #[inline(always)]
+    pub fn center_at_frame_time(&self, frame_time: f64) -> Vector3d {
+        return self.center * frame_time + &(self.center_old * (1.0 - frame_time));
     }
 }

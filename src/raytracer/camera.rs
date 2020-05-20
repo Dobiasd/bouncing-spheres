@@ -1,4 +1,5 @@
 use rand::prelude::StdRng;
+use rand::Rng;
 
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::{cross, random_in_unit_disk, unit_vector, Vector3d};
@@ -22,6 +23,7 @@ impl Camera {
         Ray {
             origin: self.origin + &offset,
             direction: self.lower_left_corner + &(self.horizontal * s) + &(self.vertical * t) - &self.origin - &offset,
+            frame_time: rng.gen_range(0.0_f64, 1.0_f64),
         }
     }
 }

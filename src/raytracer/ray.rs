@@ -3,6 +3,7 @@ use crate::raytracer::vector3d::Vector3d;
 pub struct Ray {
     pub origin: Vector3d,
     pub direction: Vector3d,
+    pub frame_time: f64,
 }
 
 impl Ray {

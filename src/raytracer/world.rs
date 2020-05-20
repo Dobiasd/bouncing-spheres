@@ -147,6 +147,7 @@ fn solve_non_overlapping_constraint(spheres: &Vec<Sphere>) -> Vec<Sphere> {
 fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     spheres.iter().map(|sphere| {
         Sphere {
+            center_old: sphere.center,
             center: sphere.center + &(sphere.speed * delta_t),
             ..*sphere
         }
