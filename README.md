@@ -37,4 +37,3 @@ The settings can be changed in `raytracer.toml`.
 # todo
 
 - Split physics and rendering code
-- Motion blur

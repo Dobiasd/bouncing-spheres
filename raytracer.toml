@@ -12,7 +12,7 @@ resolution_y = 108
 samples_per_pixel = 8
 max_depth = 4
 display_scale_factor = 5
-export = false
+export = true
 
 # Something in between
 #resolution_x = 384

@@ -165,9 +165,7 @@ fn main() {
     let window_height = config.resolution_y * config.display_scale_factor;
     let canvas = Canvas::new(window_width, window_height).title("raytracer");
 
-    let start_time = SystemTime::now();
-    let datetime: DateTime<Utc> = start_time.into();
-
+    let datetime: DateTime<Utc> = SystemTime::now().into();
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
     if config.export {
         fs::create_dir_all(Path::new(&dir_path_str)).expect(&format!("Can not create output directory: {}", dir_path_str));
@@ -177,13 +175,16 @@ fn main() {
     let mut frame_num = 0;
     canvas.render(move |_, image| {
         let t = frame_num as f64 / num_frames as f64;
+        let let_t_old = (frame_num - 1) as f64 / num_frames as f64;
         world = world.advance(1.0 / num_frames as f64);
         let sky_factor = t;
+        let cam_new = cam(image.width(), image.height(), t);
+        let cam_old = cam(image.width(), image.height(), let_t_old);
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
             image.height() / config.display_scale_factor,
             config.samples_per_pixel, config.max_depth, &world,
-            &cam(image.width(), image.height(), t),
+            &cam_new, &cam_old,
             sky_factor);
         let width = image.width();
         for (y, row) in image.chunks_mut(width).enumerate() {

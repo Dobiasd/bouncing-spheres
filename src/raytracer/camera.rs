@@ -16,14 +16,31 @@ pub struct Camera {
     w: Vector3d,
 }
 
+pub fn get_ray_camera_blend(rng: &mut StdRng, s: f64, t: f64, cam_a: &Camera, cam_b: &Camera) -> Ray {
+    let frame_time = rng.gen_range(0.0_f64, 1.0_f64);
+    let rd = random_in_unit_disk(rng) * (frame_time * cam_b.lens_radius + (1.0 - frame_time) * cam_a.lens_radius);
+    let ray_a = cam_a.get_ray_rd(s, t, rd, frame_time);
+    let ray_b = cam_b.get_ray_rd(s, t, rd, frame_time);
+    Ray {
+        origin: (ray_b.origin * frame_time + &(ray_a.origin * (1.0 - frame_time))),
+        direction: (ray_b.direction * frame_time + &(ray_a.direction * (1.0 - frame_time))),
+        frame_time,
+    }
+}
+
 impl Camera {
     pub fn get_ray(&self, rng: &mut StdRng, s: f64, t: f64) -> Ray {
         let rd = random_in_unit_disk(rng) * self.lens_radius;
+        let frame_time = rng.gen_range(0.0_f64, 1.0_f64);
+        self.get_ray_rd(s, t, rd, frame_time)
+    }
+
+    pub fn get_ray_rd(&self, s: f64, t: f64, rd: Vector3d, frame_time: f64) -> Ray {
         let offset = self.u * rd.x + &(self.v * rd.y);
         Ray {
             origin: self.origin + &offset,
             direction: self.lower_left_corner + &(self.horizontal * s) + &(self.vertical * t) - &self.origin - &offset,
-            frame_time: rng.gen_range(0.0_f64, 1.0_f64),
+            frame_time,
         }
     }
 }

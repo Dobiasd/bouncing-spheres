@@ -2,7 +2,7 @@ use rand::{Rng, SeedableRng};
 use rand::prelude::StdRng;
 use rayon::prelude::*;
 
-use crate::raytracer::camera::Camera;
+use crate::raytracer::camera::{Camera, get_ray_camera_blend};
 use crate::raytracer::color::Color;
 use crate::raytracer::image::Image;
 use crate::raytracer::ray::Ray;
@@ -39,7 +39,7 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World, depth: usize, sky_facto
 
 pub fn render(width: usize, height: usize,
               samples_per_pixel: usize, max_depth: usize,
-              world: &World, cam: &Camera, sky_factor: f64) -> Image {
+              world: &World, cam: &Camera, cam_old: &Camera, sky_factor: f64) -> Image {
     Image {
         data: (0..height).into_par_iter().map(|y| {
             let mut rng: StdRng = SeedableRng::seed_from_u64(y as u64);
@@ -47,7 +47,7 @@ pub fn render(width: usize, height: usize,
                 (0..samples_per_pixel).map(|_| {
                     let s = (x as f64 + rng.gen::<f64>()) / (width as f64 - 1.0);
                     let t = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
-                    let ray = cam.get_ray(&mut rng, s, t);
+                    let ray = get_ray_camera_blend(&mut rng, s, t, cam_old, cam);
                     ray_color(&mut rng, &ray, &world, max_depth, sky_factor)
                 }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
                         |a: Color, b: Color| a + &b)
