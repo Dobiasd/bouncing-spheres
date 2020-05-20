@@ -29,8 +29,8 @@ impl Sphere {
             front_face,
             material: Material {
                 albedo: self.material.albedo + &(self.material.albedo * self.extra_brightness),
-                reflectiveness: self.material.reflectiveness,
-                reflection_fuzz: self.material.reflection_fuzz,
+                reflectiveness: self.material.reflectiveness - self.extra_brightness,
+                reflection_fuzz: self.material.reflection_fuzz + self.extra_brightness,
             },
         }
     }

@@ -47,12 +47,12 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
                 g: rng.gen_range(0.0, 1.0),
                 b: rng.gen_range(0.0, 1.0),
             },
-            reflectiveness: (rng.gen_range(0.0_f64, 3.0_f64)).min(1.0),
-            reflection_fuzz: (rng.gen_range(-3.0_f64, 1.0_f64)).max(0.0),
+            reflectiveness: 1.0 + 0.0 * rng.gen_range(0.0, 1.0),
+            reflection_fuzz: 0.0 + 0.0 * rng.gen_range(0.0, 1.0),
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius.powf(3.0),
-        extra_brightness: 0.0
+        extra_brightness: 0.0,
     }
 }
 
@@ -65,7 +65,7 @@ fn make_world(rng: &mut StdRng) -> World {
         material: Material { albedo: Color { r: 0.5, g: 0.5, b: 0.5 }, reflectiveness: 1.0, reflection_fuzz: 0.0 },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
-        extra_brightness: 0.0
+        extra_brightness: 0.0,
     };
 
     let number_of_spheres = 80;
@@ -90,7 +90,7 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
     let dist_to_looks_at = (position - &looks_at).length();
-    let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(3.0);
+    let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(4.0);
     let aperture = 0.15;
     let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;

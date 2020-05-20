@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::ops::Deref;
 
 use itertools::Itertools;
 
@@ -65,13 +66,8 @@ fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
                 }).fold(Vector3d { x: 0.0, y: 0.0, z: 0.0 },
                         |a: Vector3d, b: Vector3d| a + &b);
             Sphere {
-                id: sphere.id,
-                center: sphere.center,
-                radius: sphere.radius,
-                material: sphere.material,
                 speed: sphere.speed + &acceleration,
-                mass: sphere.mass,
-                extra_brightness: sphere.extra_brightness,
+                ..*sphere
             }
         }).collect()
 }
@@ -111,16 +107,7 @@ fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
         }
     });
     new_spheres.iter().map(|s| {
-        let sphere = s.borrow();
-        Sphere {
-            id: sphere.id,
-            center: sphere.center,
-            radius: sphere.radius,
-            material: sphere.material,
-            speed: sphere.speed,
-            mass: sphere.mass,
-            extra_brightness: sphere.extra_brightness,
-        }
+        s.borrow().deref().deref().clone()
     }).collect()
 }
 
@@ -153,29 +140,15 @@ fn solve_non_overlapping_constraint(spheres: &Vec<Sphere>) -> Vec<Sphere> {
         })
     }
     new_spheres.iter().map(|s| {
-        let sphere = s.borrow();
-        Sphere {
-            id: sphere.id,
-            center: sphere.center,
-            radius: sphere.radius,
-            material: sphere.material,
-            speed: sphere.speed,
-            mass: sphere.mass,
-            extra_brightness: sphere.extra_brightness,
-        }
+        s.borrow().deref().deref().clone()
     }).collect()
 }
 
 fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     spheres.iter().map(|sphere| {
         Sphere {
-            id: sphere.id,
             center: sphere.center + &(sphere.speed * delta_t),
-            radius: sphere.radius,
-            material: sphere.material,
-            speed: sphere.speed,
-            mass: sphere.mass,
-            extra_brightness: sphere.extra_brightness,
+            ..*sphere
         }
     }).collect()
 }
@@ -184,13 +157,8 @@ fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     let dim_factor = 20.0;
     spheres.iter().map(|sphere| {
         Sphere {
-            id: sphere.id,
-            center: sphere.center,
-            radius: sphere.radius,
-            material: sphere.material,
-            speed: sphere.speed,
-            mass: sphere.mass,
             extra_brightness: sphere.extra_brightness - sphere.extra_brightness * dim_factor * delta_t,
+            ..*sphere
         }
     }).collect()
 }
@@ -199,15 +167,8 @@ fn friction(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     let friction = 12.1;
     spheres.iter().map(|sphere| {
         Sphere {
-            id: sphere.id,
-            center: sphere.center,
-            radius: sphere.radius,
-            material: sphere.material,
             speed: sphere.speed - &(sphere.speed * delta_t * friction),
-            mass: sphere.mass,
-            extra_brightness: sphere.extra_brightness,
+            ..*sphere
         }
     }).collect()
 }
-
-// todo: Can we create a new instance without repeating all fields?
