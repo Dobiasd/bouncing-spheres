@@ -4,6 +4,7 @@
 #samples_per_pixel = 1024
 #max_depth = 32
 #display_scale_factor = 1
+#export = true
 
 # Fast and ugly
 resolution_x = 192
@@ -11,3 +12,12 @@ resolution_y = 108
 samples_per_pixel = 8
 max_depth = 4
 display_scale_factor = 5
+export = false
+
+# Something in between
+#resolution_x = 384
+#resolution_y = 216
+#samples_per_pixel = 16
+#max_depth = 8
+#display_scale_factor = 3
+#export = true

@@ -12,7 +12,8 @@ pub struct Sphere {
     pub radius: f64,
     pub material: Material,
     pub speed: Vector3d,
-    pub mass: f64
+    pub mass: f64,
+    pub extra_brightness: f64,
 }
 
 impl Sphere {
@@ -26,7 +27,11 @@ impl Sphere {
             t,
             normal,
             front_face,
-            material: &self.material,
+            material: Material {
+                albedo: self.material.albedo + &(self.material.albedo * self.extra_brightness),
+                reflectiveness: self.material.reflectiveness,
+                reflection_fuzz: self.material.reflection_fuzz,
+            },
         }
     }
 

@@ -30,8 +30,19 @@ impl World {
     pub fn advance(&self, delta_t: f64) -> World {
         World {
             spheres:
-            move_positions(&friction(&solve_non_overlapping_constraint(&bounce(&gravitate(
-                &self.spheres, delta_t))), delta_t), delta_t)
+            //move_positions(&friction(&solve_non_overlapping_constraint(&bounce(&gravitate(&self.spheres, delta_t))), delta_t), delta_t)
+            dim(
+                &friction(
+                    &solve_non_overlapping_constraint(
+                        &bounce(
+                            &gravitate(
+                                &move_positions(
+                                    &self.spheres, delta_t),
+                                delta_t)
+                        )
+                    ),
+                    delta_t),
+                delta_t)
         }
     }
 }
@@ -60,13 +71,15 @@ fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
                 material: sphere.material,
                 speed: sphere.speed + &acceleration,
                 mass: sphere.mass,
+                extra_brightness: sphere.extra_brightness,
             }
         }).collect()
 }
 
 fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
-    let bounciness = 0.5;
-    let round_to_zero_threshold = 20.0; // Avoid infinite bouncing.
+    let bounciness = 0.46;
+    let flash_strength = 0.005;
+    let round_to_zero_threshold = 10.0; // Avoid infinite bouncing.
     let mut spheres_copy = spheres.to_vec();
     let new_spheres = spheres_copy.iter_mut()
         .map(|s| RefCell::new(s))
@@ -88,8 +101,12 @@ fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
                 let v_b_c_prime_length = (b.mass * v_b_c_length + a.mass * v_a_c_length - a.mass * (v_b_c_length - v_a_c_length) * bounciness) / (a.mass + b.mass);
                 let v_a_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_a_c_prime_length);
                 let v_b_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_b_c_prime_length);
-                a.speed = a.speed - &v_a_c + &v_a_c_prime;
-                b.speed = b.speed - &v_b_c + &v_b_c_prime;
+                let new_speed_a = a.speed - &v_a_c + &v_a_c_prime;
+                let new_speed_b = b.speed - &v_b_c + &v_b_c_prime;
+                a.extra_brightness = ((a.speed - &new_speed_a).length() * flash_strength).max(a.extra_brightness);
+                b.extra_brightness = ((b.speed - &new_speed_b).length() * flash_strength).max(b.extra_brightness);
+                a.speed = new_speed_a;
+                b.speed = new_speed_b;
             }
         }
     });
@@ -102,6 +119,7 @@ fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
             material: sphere.material,
             speed: sphere.speed,
             mass: sphere.mass,
+            extra_brightness: sphere.extra_brightness,
         }
     }).collect()
 }
@@ -143,6 +161,7 @@ fn solve_non_overlapping_constraint(spheres: &Vec<Sphere>) -> Vec<Sphere> {
             material: sphere.material,
             speed: sphere.speed,
             mass: sphere.mass,
+            extra_brightness: sphere.extra_brightness,
         }
     }).collect()
 }
@@ -156,6 +175,22 @@ fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
             material: sphere.material,
             speed: sphere.speed,
             mass: sphere.mass,
+            extra_brightness: sphere.extra_brightness,
+        }
+    }).collect()
+}
+
+fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
+    let dim_factor = 20.0;
+    spheres.iter().map(|sphere| {
+        Sphere {
+            id: sphere.id,
+            center: sphere.center,
+            radius: sphere.radius,
+            material: sphere.material,
+            speed: sphere.speed,
+            mass: sphere.mass,
+            extra_brightness: sphere.extra_brightness - sphere.extra_brightness * dim_factor * delta_t,
         }
     }).collect()
 }
@@ -170,6 +205,7 @@ fn friction(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
             material: sphere.material,
             speed: sphere.speed - &(sphere.speed * delta_t * friction),
             mass: sphere.mass,
+            extra_brightness: sphere.extra_brightness,
         }
     }).collect()
 }
