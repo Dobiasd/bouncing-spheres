@@ -19,7 +19,7 @@ Things it does not have:
 - Textures
 - Any interesting objects
 - Optimizations like bounding volume hierarchies
-- All the countless other cool things good raytracers can do
+- All the countless other cool things good and actually useful raytracers can do
 
 ![example](example.png)
 
