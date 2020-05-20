@@ -14,4 +14,4 @@ samples_per_pixel = 8
 max_depth = 4
 display_scale_factor = 5
 speed = 2.3
-num_frames = 1000
+num_frames = 240

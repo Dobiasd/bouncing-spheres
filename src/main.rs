@@ -65,8 +65,10 @@ fn make_world(rng: &mut StdRng) -> World {
         mass: radius_planet.powf(3.0),
     };
 
+    // todo: 200
+    let number_of_spheres = 100;
     World {
-        spheres: (0..200).map(move |_| random_sphere(rng))
+        spheres: (0..number_of_spheres).map(move |_| random_sphere(rng))
             .chain(std::iter::once(planet))
             .collect()
     }
@@ -84,10 +86,17 @@ fn cam(width: usize, height: usize, t: f64) -> Camera {
         z: 7.3 * (0.41 * t).sin(),
     };
     let up_direction = Vector3d { x: 0.0, y: 1.0, z: 0.0 };
-    let dist_to_focus = (position - &looks_at).length();
-    let aperture = 0.28;
+    let dist_to_looks_at = (position - &looks_at).length();
+    let dist_to_focus = dist_to_looks_at + 0.1 * (0.74 * t).sin();
+    let aperture = 0.0;
+    //let aperture = 0.28; // todo enable
     let aspect_ratio = width as f64 / height as f64;
-    Camera::new(&position, &looks_at, &up_direction, 90.0, aspect_ratio, aperture, dist_to_focus)
+    let vertical_field_of_view = 80.0 + 10.0 * (0.54 * t).sin();
+    // todo: enable
+    //Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
+
+
+    Camera::new(&Vector3d { x: 0.0, y: 2.0, z: 10.0 }, &Vector3d { x: 0.0, y: 0.0, z: 0.0 }, &up_direction, vertical_field_of_view, aspect_ratio, aperture, dist_to_focus)
 }
 
 
