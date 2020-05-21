@@ -1,10 +1,10 @@
 # Very slow and very nice
-#resolution_x = 1920
-#resolution_y = 1080
-#samples_per_pixel = 64
-#max_depth = 32
-#display_scale_factor = 1
-#export = true
+resolution_x = 1920
+resolution_y = 1080
+samples_per_pixel = 96
+max_depth = 16
+display_scale_factor = 1
+export = true
 
 # Fast and ugly
 #resolution_x = 192
@@ -15,9 +15,9 @@
 #export = false
 
 # Something in between
-resolution_x = 384
-resolution_y = 216
-samples_per_pixel = 32
-max_depth = 8
-display_scale_factor = 3
-export = true
+#resolution_x = 384
+#resolution_y = 216
+#samples_per_pixel = 32
+#max_depth = 8
+#display_scale_factor = 3
+#export = true

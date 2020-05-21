@@ -69,8 +69,8 @@ fn make_world(rng: &mut StdRng) -> World {
         radius: radius_planet,
         material: Material {
             albedo: Color { r: 0.5, g: 0.5, b: 0.5 },
-            reflectiveness: 0.7,
-            reflection_fuzz: 0.3,
+            reflectiveness: 0.8,
+            reflection_fuzz: 0.18,
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
@@ -101,8 +101,9 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
     let v_rotation = t_world.mul(40.0).sub(20.0).tanh().add(1.0).mul(PI);
     let up_direction = Vector3d { x: 0.0, y: v_rotation.cos(), z: v_rotation.sin() };
     let dist_to_looks_at = (position - &looks_at).length();
-    let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(4.0);
-    let aperture = 0.15;
+    let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(3.5);
+    let max_aperture = 0.17;
+    let aperture = max_aperture - t_world.powf(5.0) * max_aperture;
     let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;
 
@@ -120,11 +121,11 @@ fn create_video(dir_path_str: &str) {
         .arg("-c:v")
         .arg("libx264")
         .arg("-preset")
-        .arg("slow")
+        .arg("veryslow")
         .arg("-profile:v")
         .arg("high")
         .arg("-crf")
-        .arg("18")
+        .arg("12")
         .arg("-coder")
         .arg("1")
         .arg("-pix_fmt")

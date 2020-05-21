@@ -32,7 +32,7 @@ pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 
 pub fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
     let bounciness = 0.46;
-    let flash_strength = 0.007;
+    let flash_strength = 0.006;
     let round_to_zero_threshold = 10.0; // Avoid infinite bouncing.
     let mut spheres_copy = spheres.to_vec();
     let new_spheres = spheres_copy.iter_mut()
@@ -113,7 +113,7 @@ pub fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 }
 
 pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let dim_factor = 5.0;
+    let dim_factor = 8.0;
     spheres.iter().map(|sphere| {
         Sphere {
             extra_brightness: sphere.extra_brightness -
