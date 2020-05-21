@@ -2,7 +2,7 @@
 
 A very simplistic raytracer - implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
 
-![example](example.png)
+![example](images/example.png)
 
 Features:
 - Spheres as the only type of object
