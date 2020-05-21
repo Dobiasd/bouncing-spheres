@@ -57,8 +57,14 @@ pub fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
                 let v_b_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_b_c_prime_length);
                 let new_speed_a = a.speed - &v_a_c + &v_a_c_prime;
                 let new_speed_b = b.speed - &v_b_c + &v_b_c_prime;
-                a.extra_brightness = ((a.speed - &new_speed_a).length() * flash_strength).max(a.extra_brightness);
-                b.extra_brightness = ((b.speed - &new_speed_b).length() * flash_strength).max(b.extra_brightness);
+                let acceleration_a = (a.speed - &new_speed_a).length();
+                let acceleration_b = (b.speed - &new_speed_b).length();
+                if acceleration_a > 10.0 {
+                    a.extra_brightness = (acceleration_a * flash_strength).max(a.extra_brightness);
+                }
+                if acceleration_b > 10.0 {
+                    b.extra_brightness = (acceleration_b * flash_strength).max(b.extra_brightness);
+                }
                 a.speed = new_speed_a;
                 b.speed = new_speed_b;
             }
@@ -113,11 +119,13 @@ pub fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 }
 
 pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let dim_factor = 8.0;
+    let dim_factor = 5.0;
+    let dim_constant = 1.25;
     spheres.iter().map(|sphere| {
         Sphere {
-            extra_brightness: sphere.extra_brightness -
-                sphere.extra_brightness * dim_factor * delta_t,
+            extra_brightness: (sphere.extra_brightness -
+                (sphere.extra_brightness * dim_factor * delta_t +
+                    dim_constant * delta_t)).max(0.0),
             ..*sphere
         }
     }).collect()

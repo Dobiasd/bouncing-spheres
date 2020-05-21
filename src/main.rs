@@ -69,8 +69,8 @@ fn make_world(rng: &mut StdRng) -> World {
         radius: radius_planet,
         material: Material {
             albedo: Color { r: 0.5, g: 0.5, b: 0.5 },
-            reflectiveness: 0.8,
-            reflection_fuzz: 0.1,
+            reflectiveness: 0.75,
+            reflection_fuzz: 0.08,
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
@@ -86,8 +86,8 @@ fn make_world(rng: &mut StdRng) -> World {
     }
 }
 
-fn cam(width: usize, height: usize, t_world: f64) -> Camera {
-    let t_cam = t_world.mul(5.0).sub(2.3).tanh().add(1.0).div(2.0);
+fn cam(width: usize, height: usize, t_real: f64) -> Camera {
+    let t_cam = t_real.mul(5.0).sub(2.3).tanh().add(1.0).div(2.0);
     let position = Vector3d {
         x: 15.0 * (7.1 * t_cam).sin(),
         y: 0.1 + 8.1 * t_cam.mul(-1.0).add(1.0),
@@ -98,12 +98,12 @@ fn cam(width: usize, height: usize, t_world: f64) -> Camera {
         y: position.y.sqrt().div(4.0),
         z: 0.3 * (8.1 * t_cam).cos(),
     };
-    let v_rotation = t_world.mul(40.0).sub(20.0).tanh().add(1.0).mul(PI);
+    let v_rotation = t_real.mul(40.0).sub(20.0).tanh().add(1.0).mul(PI);
     let up_direction = Vector3d { x: 0.0, y: v_rotation.cos(), z: v_rotation.sin() };
     let dist_to_looks_at = (position - &looks_at).length();
     let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(3.5);
     let max_aperture = 0.17;
-    let aperture = max_aperture - t_world.powf(5.0) * max_aperture;
+    let aperture = max_aperture - t_real.powf(5.0) * max_aperture;
     let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;
 
@@ -207,6 +207,9 @@ fn main() {
                 ).to_canvas_color()
             }
         }
+
+        // todo remove
+        println!("{}", world.spheres.iter().map(|s| s.extra_brightness).max_by(|a, b| a.partial_cmp(b).unwrap()).expect("asd"));
         if config.export {
             pixels.save_png(&Path::new(&dir_path_str)
                 .join(format!("{:08}.png", frame_num)));
