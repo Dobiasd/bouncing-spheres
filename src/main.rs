@@ -70,7 +70,7 @@ fn make_world(rng: &mut StdRng) -> World {
         material: Material {
             albedo: Color { r: 0.5, g: 0.5, b: 0.5 },
             reflectiveness: 0.8,
-            reflection_fuzz: 0.18,
+            reflection_fuzz: 0.1,
         },
         speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
         mass: radius_planet.powf(3.0),
