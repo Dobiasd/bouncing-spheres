@@ -1,4 +1,4 @@
-# Raytracer
+# bouncing-spheres
 
 A very simplistic raytracer - implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
 
@@ -31,7 +31,7 @@ TODO: Add link to video
 # Compile and run
 
 ```bash
-RUSTFLAGS="-C target-cpu=native" cargo run --release --package raytracer --bin main
+RUSTFLAGS="-C target-cpu=native" cargo run --release --package bouncing-spheres --bin main
 ```
 
 When done, you'll find an `output` directory with a bunch of images (`.png`) files and (if `ffmpeg` is available) a video (`.mp4`) in it.

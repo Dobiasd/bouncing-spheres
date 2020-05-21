@@ -170,7 +170,7 @@ fn main() {
 
     let window_width = config.resolution_x * config.display_scale_factor;
     let window_height = config.resolution_y * config.display_scale_factor;
-    let canvas = Canvas::new(window_width, window_height).title("raytracer");
+    let canvas = Canvas::new(window_width, window_height).title("bouncing-spheres");
 
     let datetime: DateTime<Utc> = SystemTime::now().into();
     let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
