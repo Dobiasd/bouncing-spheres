@@ -31,8 +31,8 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
     }
     let day1 = Color { r: 1.0, g: 1.0, b: 1.0 };
     let day2 = Color { r: 0.5, g: 0.7, b: 1.0 };
-    let night1 = Color { r: 0.8, g: 0.8, b: 0.8 };
-    let night2 = Color { r: 0.4, g: 0.1, b: 0.2 };
+    let night1 = Color { r: 0.8, g: 0.6, b: 0.7 };
+    let night2 = Color { r: 0.4, g: 0.1, b: 0.15 };
     let col1 = (night1 * sky_factor) + &(day1 * (1.0 - sky_factor));
     let col2 = (night2 * sky_factor) + &(day2 * (1.0 - sky_factor));
     let blend = 0.5 * (unit_vector(&ray.direction).y + 1.0);

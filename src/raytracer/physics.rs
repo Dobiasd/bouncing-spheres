@@ -120,7 +120,7 @@ pub fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
 
 pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     let dim_factor = 5.0;
-    let dim_constant = 1.25;
+    let dim_constant = 1.32;
     spheres.iter().map(|sphere| {
         Sphere {
             extra_brightness: (sphere.extra_brightness -
