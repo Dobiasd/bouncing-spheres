@@ -125,7 +125,7 @@ fn create_video(dir_path_str: &str) {
         .arg("-profile:v")
         .arg("high")
         .arg("-crf")
-        .arg("12")
+        .arg("18")
         .arg("-coder")
         .arg("1")
         .arg("-pix_fmt")
