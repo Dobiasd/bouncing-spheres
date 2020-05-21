@@ -207,9 +207,6 @@ fn main() {
                 ).to_canvas_color()
             }
         }
-
-        // todo remove
-        println!("{}", world.spheres.iter().map(|s| s.extra_brightness).max_by(|a, b| a.partial_cmp(b).unwrap()).expect("asd"));
         if config.export {
             pixels.save_png(&Path::new(&dir_path_str)
                 .join(format!("{:08}.png", frame_num)));
