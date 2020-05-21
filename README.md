@@ -17,7 +17,7 @@ Features:
 
 Things it does not have:
 - Refraction
-- Fog
+- Fog (and other volumes)
 - Textures
 - Optimizations like bounding volume hierarchies
 - Any interesting objects
