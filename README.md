@@ -2,8 +2,6 @@
 
 A very simplistic raytracer - implemented in Rust - based on [a nice tutorial by Peter Shirley](https://raytracing.github.io/books/RayTracingInOneWeekend.html).
 
-https://youtu.be/NPh1-T89xjE
-
 ![example](images/example.jpg)
 
 Features:
