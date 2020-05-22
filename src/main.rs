@@ -183,6 +183,7 @@ fn main() {
     let mut frame_num = 0;
     let mut t_world = 0.0;
     let mut t_world_old = 0.0;
+    let mut last_frame_start_time = SystemTime::now();
     canvas.render(move |_, image| {
         let t_real = frame_num as f64 / num_frames as f64;
         let time_old = (frame_num - 1) as f64 / num_frames as f64;
@@ -213,6 +214,13 @@ fn main() {
         } else {
             println!("Frame {} of {}", frame_num, num_frames)
         }
+
+        let frame_done_time = SystemTime::now();
+        let elapsed = frame_done_time.duration_since(last_frame_start_time)
+            .expect("Time is broken.");
+        last_frame_start_time = frame_done_time;
+        println!("Duration to render the frame: {} ms", elapsed.as_millis());
+
         if frame_num >= num_frames {
             create_video(&dir_path_str);
             std::process::exit(0);
