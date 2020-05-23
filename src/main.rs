@@ -8,8 +8,6 @@ use std::io::Read;
 use std::time::SystemTime;
 
 use pixel_canvas::Canvas;
-use rand::prelude::StdRng;
-use rand::SeedableRng;
 
 use crate::animation::animation::{cam, make_world};
 use crate::export::export::Exporter;
@@ -39,29 +37,25 @@ fn read_config() -> Config {
 }
 
 fn render(config: Config) {
-    let mut rng: StdRng = SeedableRng::seed_from_u64(42);
-    let mut world = make_world(&mut rng);
+    let mut world = make_world();
 
-    let window_width = config.resolution_x * config.display_scale_factor;
-    let window_height = config.resolution_y * config.display_scale_factor;
-    let canvas = Canvas::new(window_width, window_height).title("bouncing-spheres");
+    let canvas = Canvas::new(
+        config.resolution_x * config.display_scale_factor,
+        config.resolution_y * config.display_scale_factor)
+        .title("bouncing-spheres");
 
     let exporter = Exporter::new(config.export);
 
     let num_frames = 960;
     let mut frame_num = 0;
-    let mut t_world = 0.0;
-    let mut t_world_old = 0.0;
     let mut last_frame_start_time = SystemTime::now();
     canvas.render(move |_, image| {
         let t_real = frame_num as f64 / num_frames as f64;
-        let time_old = (frame_num - 1) as f64 / num_frames as f64;
-        t_world_old = t_world;
-        t_world = t_real - (50.0 * (t_real - 0.417)).tanh() / 50.0 - 0.02;
-        world = world.advance(t_world - t_world_old);
+        let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames as f64).max(0.0);
+        world = world.advance(t_real, t_real_previous_frame);
         let sky_factor = t_real;
         let cam_new = cam(image.width(), image.height(), t_real);
-        let cam_old = cam(image.width(), image.height(), time_old);
+        let cam_old = cam(image.width(), image.height(), t_real_previous_frame);
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
             image.height() / config.display_scale_factor,

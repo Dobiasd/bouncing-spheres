@@ -23,7 +23,10 @@ impl World {
         rec
     }
 
-    pub fn advance(&self, delta_t: f64) -> World {
+    pub fn advance(&self, t_real: f64, t_real_previous_frame: f64) -> World {
+        let delta_t = world_time_from_real_time(t_real) -
+            world_time_from_real_time(t_real_previous_frame);
+        println!("delta_t {}", delta_t);
         World {
             spheres:
             dim(
@@ -40,4 +43,8 @@ impl World {
                 delta_t)
         }
     }
+}
+
+fn world_time_from_real_time(t_real: f64) -> f64 {
+    t_real - (50.0 * (t_real - 0.417)).tanh() / 50.0 - 0.02
 }

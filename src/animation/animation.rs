@@ -3,6 +3,7 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use rand::prelude::StdRng;
 use rand::Rng;
+use rand::SeedableRng;
 use uuid::Uuid;
 
 use crate::raytracer::camera::Camera;
@@ -43,7 +44,8 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
     }
 }
 
-pub fn make_world(rng: &mut StdRng) -> World {
+pub fn make_world() -> World {
+    let mut rng: StdRng = SeedableRng::seed_from_u64(42);
     let radius_planet = 6371.0;
     let center = Vector3d { x: 0.0, y: -radius_planet, z: 0.0 };
     let planet = Sphere {
@@ -63,7 +65,7 @@ pub fn make_world(rng: &mut StdRng) -> World {
 
     let number_of_spheres = 80;
     World {
-        spheres: (0..number_of_spheres).map(move |_| random_sphere(rng))
+        spheres: (0..number_of_spheres).map(move |_| random_sphere(&mut rng))
             .chain(std::iter::once(planet))
             .collect()
     }
