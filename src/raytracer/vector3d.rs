@@ -133,3 +133,7 @@ pub fn zero_in(dist_to_zero: f64, x: f64) -> f64 {
         x
     }
 }
+
+pub fn null_vector() -> Vector3d {
+    Vector3d { x: 0.0, y: 0.0, z: 0.0 }
+}

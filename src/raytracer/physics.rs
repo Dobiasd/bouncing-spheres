@@ -4,7 +4,7 @@ use std::ops::Deref;
 use itertools::Itertools;
 
 use crate::raytracer::sphere::Sphere;
-use crate::raytracer::vector3d::{dot, unit_vector, Vector3d, zero_in};
+use crate::raytracer::vector3d::{dot, null_vector, unit_vector, Vector3d, zero_in};
 
 pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     let gravity_constant = 0.73;
@@ -15,13 +15,13 @@ pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
                 .iter()
                 .map(|other| {
                     if other.id == sphere.id {
-                        Vector3d { x: 0.0, y: 0.0, z: 0.0 }
+                        null_vector()
                     } else {
                         let diff = other.center - &sphere.center;
                         let dist = diff.length();
                         unit_vector(&diff) * delta_t * gravity_constant * other.mass / dist.powf(2.0)
                     }
-                }).fold(Vector3d { x: 0.0, y: 0.0, z: 0.0 },
+                }).fold(null_vector(),
                         |a: Vector3d, b: Vector3d| a + &b);
             Sphere {
                 speed: sphere.speed + &acceleration,

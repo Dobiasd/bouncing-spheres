@@ -11,7 +11,7 @@ use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
 use crate::raytracer::render::Sky;
 use crate::raytracer::sphere::Sphere;
-use crate::raytracer::vector3d::Vector3d;
+use crate::raytracer::vector3d::{null_vector, Vector3d};
 use crate::raytracer::world::World;
 
 fn random_sphere(rng: &mut StdRng) -> Sphere {
@@ -38,7 +38,7 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
             reflectiveness: 1.0 + 0.0 * rng.gen_range(0.0, 1.0),
             reflection_fuzz: 0.0 + 0.0 * rng.gen_range(0.0, 1.0),
         },
-        speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
+        speed: null_vector(),
         mass: radius.powf(3.0),
         extra_brightness: 0.0,
         center_old: center,
@@ -58,7 +58,7 @@ pub fn make_world() -> World {
             reflectiveness: 0.75,
             reflection_fuzz: 0.08,
         },
-        speed: Vector3d { x: 0.0, y: 0.0, z: 0.0 },
+        speed: null_vector(),
         mass: radius_planet.powf(3.0),
         extra_brightness: 0.0,
         center_old: center,
