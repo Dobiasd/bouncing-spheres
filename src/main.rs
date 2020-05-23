@@ -3,24 +3,20 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
-use std::fs;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
 use std::time::SystemTime;
 
-use chrono::DateTime;
-use chrono::offset::Utc;
 use pixel_canvas::Canvas;
 use rand::prelude::StdRng;
 use rand::SeedableRng;
 
 use crate::animation::animation::{cam, make_world};
-use crate::video::video::create_video;
+use crate::export::export::Exporter;
 
 mod raytracer;
 mod animation;
-mod video;
+mod export;
 
 #[derive(Debug, Deserialize)]
 struct Config {
@@ -50,12 +46,7 @@ fn render(config: Config) {
     let window_height = config.resolution_y * config.display_scale_factor;
     let canvas = Canvas::new(window_width, window_height).title("bouncing-spheres");
 
-    let datetime: DateTime<Utc> = SystemTime::now().into();
-    let dir_path_str = format!("./output/{}", datetime.format("%Y-%m-%d_%H-%M-%S"));
-    if config.export {
-        fs::create_dir_all(Path::new(&dir_path_str))
-            .expect(&format!("Can not create output directory: {}", dir_path_str));
-    }
+    let exporter = Exporter::new(config.export);
 
     let num_frames = 960;
     let mut frame_num = 0;
@@ -86,12 +77,8 @@ fn render(config: Config) {
                 ).to_canvas_color()
             }
         }
-        if config.export {
-            pixels.save_png(&Path::new(&dir_path_str)
-                .join(format!("{:08}.png", frame_num)));
-        } else {
-            println!("Frame {} of {}", frame_num, num_frames)
-        }
+
+        exporter.process_frame(&pixels, frame_num, num_frames);
 
         let frame_done_time = SystemTime::now();
         let elapsed = frame_done_time.duration_since(last_frame_start_time)
@@ -100,7 +87,7 @@ fn render(config: Config) {
         println!("Duration to render the frame: {} ms", elapsed.as_millis());
 
         if frame_num >= num_frames {
-            create_video(&dir_path_str);
+            exporter.combine_frames_to_video();
             std::process::exit(0);
         }
         frame_num += 1;
