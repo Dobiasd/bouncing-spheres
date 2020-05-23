@@ -16,14 +16,19 @@ pub struct Camera {
     w: Vector3d,
 }
 
+pub struct CameraRange {
+    pub cam_a: Camera,
+    pub cam_b: Camera,
+}
+
 pub fn get_ray_camera_blend(rng: &mut StdRng,
                             horizontal_fraction: f64, vertical_fraction: f64,
-                            cam_a: &Camera, cam_b: &Camera) -> Ray {
+                            cams: &CameraRange) -> Ray {
     let frame_time = rng.gen_range(0.0_f64, 1.0_f64);
     let rd = random_in_unit_disk(rng) *
-        (frame_time * cam_b.lens_radius + (1.0 - frame_time) * cam_a.lens_radius);
-    let ray_a = cam_a.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
-    let ray_b = cam_b.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
+        (frame_time * cams.cam_b.lens_radius + (1.0 - frame_time) * cams.cam_a.lens_radius);
+    let ray_a = cams.cam_a.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
+    let ray_b = cams.cam_b.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
     Ray {
         origin: (ray_b.origin * frame_time + &(ray_a.origin * (1.0 - frame_time))),
         direction: (ray_b.direction * frame_time + &(ray_a.direction * (1.0 - frame_time))),

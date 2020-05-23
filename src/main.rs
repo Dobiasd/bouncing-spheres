@@ -11,6 +11,7 @@ use pixel_canvas::Canvas;
 
 use crate::animation::animation::{cam, make_world};
 use crate::export::export::Exporter;
+use crate::raytracer::camera::CameraRange;
 
 mod raytracer;
 mod animation;
@@ -54,14 +55,15 @@ fn render(config: Config) {
         let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames as f64).max(0.0);
         world = world.advance(t_real, t_real_previous_frame);
         let sky_factor = t_real;
-        let cam_new = cam(image.width(), image.height(), t_real);
-        let cam_old = cam(image.width(), image.height(), t_real_previous_frame);
+        let cams = CameraRange {
+            cam_a: cam(image.width(), image.height(), t_real),
+            cam_b: cam(image.width(), image.height(), t_real_previous_frame),
+        };
         let pixels = raytracer::render::render(
             image.width() / config.display_scale_factor,
             image.height() / config.display_scale_factor,
             config.samples_per_pixel, config.max_depth, &world,
-            &cam_new, &cam_old,
-            sky_factor);
+            &cams, sky_factor);
         let width = image.width();
         for (y, row) in image.chunks_mut(width).enumerate() {
             for (x, pixel) in row.iter_mut().enumerate() {
