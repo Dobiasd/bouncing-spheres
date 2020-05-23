@@ -6,7 +6,7 @@ use rand::Rng;
 use rand::SeedableRng;
 use uuid::Uuid;
 
-use crate::raytracer::camera::Camera;
+use crate::raytracer::camera::{Camera, CameraRange};
 use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
 use crate::raytracer::sphere::Sphere;
@@ -71,7 +71,14 @@ pub fn make_world() -> World {
     }
 }
 
-pub fn cam(width: usize, height: usize, t_real: f64) -> Camera {
+pub fn camera_range(t_real: f64, t_real_previous_frame: f64, aspect_ratio: f64) -> CameraRange {
+    CameraRange {
+        cam_a: cam(t_real, aspect_ratio),
+        cam_b: cam(t_real_previous_frame, aspect_ratio),
+    }
+}
+
+pub fn cam(t_real: f64, aspect_ratio: f64) -> Camera {
     let t_cam = t_real.mul(5.0).sub(2.3).tanh().add(1.0).div(2.0);
     let position = Vector3d {
         x: 15.0 * (7.1 * t_cam).sin(),
@@ -89,9 +96,12 @@ pub fn cam(width: usize, height: usize, t_real: f64) -> Camera {
     let dist_to_focus = (dist_to_looks_at + 0.1 * (0.74 * t_cam).sin()).max(3.5);
     let max_aperture = 0.17;
     let aperture = max_aperture - t_real.powf(5.0) * max_aperture;
-    let aspect_ratio = width as f64 / height as f64;
     let vertical_field_of_view = 80.0;
 
     Camera::new(&position, &looks_at, &up_direction, vertical_field_of_view,
                 aspect_ratio, aperture, dist_to_focus)
+}
+
+pub fn num_frames() -> usize {
+    960
 }

@@ -5,13 +5,13 @@ extern crate serde_derive;
 
 use std::fs::File;
 use std::io::Read;
-use std::time::SystemTime;
 
-use pixel_canvas::Canvas;
+use pixel_canvas::{Canvas, Image as CanvasImage};
 
-use crate::animation::animation::{cam, make_world};
+use crate::animation::animation::{camera_range, make_world, num_frames};
 use crate::export::export::Exporter;
-use crate::raytracer::camera::CameraRange;
+use crate::export::stopwatch::Stopwatch;
+use crate::raytracer::image::Image;
 
 mod raytracer;
 mod animation;
@@ -46,43 +46,28 @@ fn render(config: Config) {
         .title("bouncing-spheres");
 
     let exporter = Exporter::new(config.export);
-
-    let num_frames = 960;
     let mut frame_num = 0;
-    let mut last_frame_start_time = SystemTime::now();
+    let mut stopwatch = Stopwatch::new();
+
     canvas.render(move |_, image| {
-        let t_real = frame_num as f64 / num_frames as f64;
-        let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames as f64).max(0.0);
+        let t_real = frame_num as f64 / num_frames() as f64;
+        let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames() as f64).max(0.0);
+
         world = world.advance(t_real, t_real_previous_frame);
-        let sky_factor = t_real;
-        let cams = CameraRange {
-            cam_a: cam(image.width(), image.height(), t_real),
-            cam_b: cam(image.width(), image.height(), t_real_previous_frame),
-        };
+
+        let cams = camera_range(t_real, t_real_previous_frame,
+                                image.width() as f64 / image.height() as f64);
+
         let pixels = raytracer::render::render(
-            image.width() / config.display_scale_factor,
-            image.height() / config.display_scale_factor,
+            config.resolution_x, config.resolution_y,
             config.samples_per_pixel, config.max_depth, &world,
-            &cams, sky_factor);
-        let width = image.width();
-        for (y, row) in image.chunks_mut(width).enumerate() {
-            for (x, pixel) in row.iter_mut().enumerate() {
-                *pixel = pixels.get(
-                    x / config.display_scale_factor,
-                    y / config.display_scale_factor,
-                ).to_canvas_color()
-            }
-        }
+            &cams, t_real);
 
-        exporter.process_frame(&pixels, frame_num, num_frames);
+        plot_pixels(image, &pixels, config.display_scale_factor);
+        exporter.process_frame(&pixels, frame_num, num_frames());
+        println!("Duration to render the frame: {} ms", stopwatch.check_and_reset().as_millis());
 
-        let frame_done_time = SystemTime::now();
-        let elapsed = frame_done_time.duration_since(last_frame_start_time)
-            .expect("Time is broken.");
-        last_frame_start_time = frame_done_time;
-        println!("Duration to render the frame: {} ms", elapsed.as_millis());
-
-        if frame_num >= num_frames {
+        if frame_num >= num_frames() {
             exporter.combine_frames_to_video();
             std::process::exit(0);
         }
@@ -90,6 +75,17 @@ fn render(config: Config) {
     });
 }
 
+fn plot_pixels(image: &mut CanvasImage, pixels: &Image, scale_factor: usize) {
+    let width = image.width();
+    for (y, row) in image.chunks_mut(width).enumerate() {
+        for (x, pixel) in row.iter_mut().enumerate() {
+            *pixel = pixels.get(
+                x / scale_factor,
+                y / scale_factor,
+            ).to_canvas_color()
+        }
+    }
+}
 
 fn main() {
     render(read_config());
