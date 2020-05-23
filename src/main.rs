@@ -8,7 +8,7 @@ use std::io::Read;
 
 use pixel_canvas::{Canvas, Image as CanvasImage};
 
-use crate::animation::animation::{camera_range, make_world, num_frames};
+use crate::animation::animation::{camera_range, make_world, num_frames, sky};
 use crate::export::export::Exporter;
 use crate::export::stopwatch::Stopwatch;
 use crate::raytracer::image::Image;
@@ -47,7 +47,7 @@ fn render(config: Config) {
 
     let exporter = Exporter::new(config.export);
     let mut frame_num = 0;
-    let mut stopwatch = Stopwatch::new();
+    let mut frame_stopwatch = Stopwatch::new();
 
     canvas.render(move |_, image| {
         let t_real = frame_num as f64 / num_frames() as f64;
@@ -61,17 +61,17 @@ fn render(config: Config) {
         let pixels = raytracer::render::render(
             config.resolution_x, config.resolution_y,
             config.samples_per_pixel, config.max_depth, &world,
-            &cams, t_real);
+            &cams, &sky(t_real));
 
         plot_pixels(image, &pixels, config.display_scale_factor);
         exporter.process_frame(&pixels, frame_num, num_frames());
-        println!("Duration to render the frame: {} ms", stopwatch.check_and_reset().as_millis());
+        println!("Duration to render the frame: {} ms", frame_stopwatch.check_and_reset().as_millis());
 
+        frame_num += 1;
         if frame_num >= num_frames() {
             exporter.combine_frames_to_video();
             std::process::exit(0);
         }
-        frame_num += 1;
     });
 }
 

@@ -30,7 +30,7 @@ impl Exporter {
                 frame.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
             }
             None => {
-                println!("Frame {} of {}", frame_num, num_frames);
+                println!("Frame {} of {}", frame_num + 1, num_frames);
             }
         }
     }

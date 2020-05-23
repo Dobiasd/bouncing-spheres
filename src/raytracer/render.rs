@@ -9,9 +9,14 @@ use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::unit_vector;
 use crate::raytracer::world::World;
 
+pub struct Sky {
+    pub col1: Color,
+    pub col2: Color,
+}
+
 #[inline(always)]
 fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
-             depth: usize, sky_factor: f64) -> Color {
+             depth: usize, sky: &Sky) -> Color {
     if depth <= 0 {
         return Color { r: 0.0, g: 0.0, b: 0.0 };
     }
@@ -22,26 +27,21 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
             return match rec.material.scatter(rng, &ray, &rec) {
                 Some((scattered, attenuation)) => {
                     attenuation * &ray_color(rng, &scattered,
-                                             world, depth - 1, sky_factor)
+                                             world, depth - 1, sky)
                 }
                 None => Color { r: 0.0, g: 0.0, b: 0.0 }
             };
         }
         None => {}
     }
-    let day1 = Color { r: 1.0, g: 1.0, b: 1.0 };
-    let day2 = Color { r: 0.5, g: 0.7, b: 1.0 };
-    let night1 = Color { r: 0.8, g: 0.6, b: 0.7 };
-    let night2 = Color { r: 0.4, g: 0.1, b: 0.15 };
-    let col1 = (night1 * sky_factor) + &(day1 * (1.0 - sky_factor));
-    let col2 = (night2 * sky_factor) + &(day2 * (1.0 - sky_factor));
+
     let blend = 0.5 * (unit_vector(&ray.direction).y + 1.0);
-    col1 * (1.0 - blend) + &(col2 * blend)
+    sky.col1 * (1.0 - blend) + &(sky.col2 * blend)
 }
 
 pub fn render(width: usize, height: usize,
               samples_per_pixel: usize, max_depth: usize,
-              world: &World, cams: &CameraRange, sky_factor: f64) -> Image {
+              world: &World, cams: &CameraRange, sky: &Sky) -> Image {
     Image {
         data: (0..height).into_par_iter().map(|y| {
             let mut rng: StdRng = SeedableRng::seed_from_u64(y as u64);
@@ -51,7 +51,7 @@ pub fn render(width: usize, height: usize,
                     let vertical_fraction = (y as f64 + rng.gen::<f64>()) / (height as f64 - 1.0);
                     let ray = get_ray_camera_blend(
                         &mut rng, horizontal_fraction, vertical_fraction, cams);
-                    ray_color(&mut rng, &ray, &world, max_depth, sky_factor)
+                    ray_color(&mut rng, &ray, &world, max_depth, sky)
                 }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
                         |a: Color, b: Color| a + &b)
             }).collect()

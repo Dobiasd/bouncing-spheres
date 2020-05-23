@@ -9,6 +9,7 @@ use uuid::Uuid;
 use crate::raytracer::camera::{Camera, CameraRange};
 use crate::raytracer::color::Color;
 use crate::raytracer::material::Material;
+use crate::raytracer::render::Sky;
 use crate::raytracer::sphere::Sphere;
 use crate::raytracer::vector3d::Vector3d;
 use crate::raytracer::world::World;
@@ -104,4 +105,16 @@ pub fn cam(t_real: f64, aspect_ratio: f64) -> Camera {
 
 pub fn num_frames() -> usize {
     960
+}
+
+pub fn sky(t_real: f64) -> Sky {
+    let sky_factor = t_real;
+    let day1 = Color { r: 1.0, g: 1.0, b: 1.0 };
+    let day2 = Color { r: 0.5, g: 0.7, b: 1.0 };
+    let night1 = Color { r: 0.8, g: 0.6, b: 0.7 };
+    let night2 = Color { r: 0.4, g: 0.1, b: 0.15 };
+    Sky {
+        col1: (night1 * sky_factor) + &(day1 * (1.0 - sky_factor)),
+        col2: (night2 * sky_factor) + &(day2 * (1.0 - sky_factor)),
+    }
 }
