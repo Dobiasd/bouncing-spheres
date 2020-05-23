@@ -3,7 +3,7 @@ use rand::prelude::StdRng;
 use rayon::prelude::*;
 
 use crate::raytracer::camera::{CameraRange, get_ray_camera_blend};
-use crate::raytracer::color::Color;
+use crate::raytracer::color::{black, Color};
 use crate::raytracer::image::Image;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::unit_vector;
@@ -18,7 +18,7 @@ pub struct Sky {
 fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
              depth: usize, sky: &Sky) -> Color {
     if depth <= 0 {
-        return Color { r: 0.0, g: 0.0, b: 0.0 };
+        return black();
     }
     let t_min = 0.001;
     let t_max = 9999999999.9;
@@ -29,7 +29,7 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
                     attenuation * &ray_color(rng, &scattered,
                                              world, depth - 1, sky)
                 }
-                None => Color { r: 0.0, g: 0.0, b: 0.0 }
+                None => black()
             };
         }
         None => {}
@@ -52,7 +52,7 @@ pub fn render(width: usize, height: usize,
                     let ray = get_ray_camera_blend(
                         &mut rng, horizontal_fraction, vertical_fraction, cams);
                     ray_color(&mut rng, &ray, &world, max_depth, sky)
-                }).fold(Color { r: 0.0, g: 0.0, b: 0.0 },
+                }).fold(black(),
                         |a: Color, b: Color| a + &b)
             }).collect()
         }).collect::<Vec<Vec<Color>>>()

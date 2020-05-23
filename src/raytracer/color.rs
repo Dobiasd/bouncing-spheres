@@ -57,3 +57,7 @@ impl Add<&Color> for Color {
         Color { r: self.r + other.r, g: self.g + other.g, b: self.b + other.b }
     }
 }
+
+pub fn black() -> Color {
+    Color { r: 0.0, g: 0.0, b: 0.0 }
+}
