@@ -1,11 +1,14 @@
 extern crate chrono;
+extern crate log;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate simple_logger;
 
 use std::fs::File;
 use std::io::Read;
 
+use log::info;
 use pixel_canvas::{Canvas, Image as CanvasImage};
 
 use crate::animation::animation::{camera_range, make_world, num_frames, physics_settings, sky};
@@ -64,8 +67,10 @@ fn render(config: Config) {
             &cams, &sky(t_real));
 
         plot_pixels(image, &pixels, config.display_scale_factor);
-        exporter.process_frame(&pixels, frame_num, num_frames());
-        println!("Duration to render the frame: {} ms", frame_stopwatch.check_and_reset().as_millis());
+        exporter.process_frame(&pixels, frame_num);
+        info!("Time spent to render the current frame ({}/{}): {} ms",
+              frame_num + 1, num_frames(),
+              frame_stopwatch.check_and_reset().as_millis());
 
         frame_num += 1;
         if frame_num >= num_frames() {
@@ -87,6 +92,8 @@ fn plot_pixels(image: &mut CanvasImage, pixels: &Image, scale_factor: usize) {
     }
 }
 
-fn main() {
+fn main()
+{
+    simple_logger::init().unwrap();
     render(read_config());
 }

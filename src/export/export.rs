@@ -4,6 +4,7 @@ use std::process::Command;
 use std::time::SystemTime;
 
 use chrono::{DateTime, Utc};
+use log::info;
 
 use crate::raytracer::image::Image;
 
@@ -24,14 +25,15 @@ impl Exporter {
         }
     }
 
-    pub fn process_frame(&self, frame: &Image, frame_num: usize, num_frames: usize) {
+    pub fn process_frame(&self, frame: &Image, frame_num: usize) {
         match &self.dir_path_str {
             Some(dir_path_str) => {
-                frame.save_png(&Path::new(&dir_path_str).join(format!("{:08}.png", frame_num)));
+                let image_path = &Path::new(&dir_path_str)
+                    .join(format!("{:08}.png", frame_num));
+                info!("Saving {}", image_path.display());
+                frame.save_png(image_path);
             }
-            None => {
-                println!("Frame {} of {}", frame_num + 1, num_frames);
-            }
+            None => {}
         }
     }
 
@@ -39,7 +41,7 @@ impl Exporter {
         match &self.dir_path_str {
             Some(dir_path_str) => {
                 let video_path = format!("{}.mp4", dir_path_str);
-                println!("Saving {}", video_path);
+                info!("Saving {}", video_path);
                 Command::new("ffmpeg")
                     .arg("-i")
                     .arg(format!("{}/%08d.png", dir_path_str))
