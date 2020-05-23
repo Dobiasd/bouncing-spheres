@@ -9,6 +9,7 @@ use uuid::Uuid;
 use crate::raytracer::camera::{Camera, CameraRange};
 use crate::raytracer::color::{blend_colors, Color};
 use crate::raytracer::material::Material;
+use crate::raytracer::physics::PhysicsSettings;
 use crate::raytracer::render::Sky;
 use crate::raytracer::sphere::Sphere;
 use crate::raytracer::vector3d::{null_vector, Vector3d};
@@ -116,5 +117,17 @@ pub fn sky(t_real: f64) -> Sky {
     Sky {
         col1: blend_colors(&night1, &day1, sky_factor),
         col2: blend_colors(&night2, &day2, sky_factor),
+    }
+}
+
+pub fn physics_settings() -> PhysicsSettings {
+    PhysicsSettings {
+        gravity_constant: 0.73,
+        bounciness: 0.46,
+        bounce_round_to_zero_threshold: 10.0,
+        flash_strength: 0.006,
+        dim_factor: 5.0,
+        dim_constant: 1.32,
+        friction: 12.1,
     }
 }

@@ -6,8 +6,20 @@ use itertools::Itertools;
 use crate::raytracer::sphere::Sphere;
 use crate::raytracer::vector3d::{dot, null_vector, unit_vector, Vector3d, zero_in};
 
-pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let gravity_constant = 0.73;
+pub struct PhysicsSettings {
+    pub gravity_constant: f64,
+    pub bounciness: f64,
+
+    // Avoid infinite bouncing
+    pub bounce_round_to_zero_threshold: f64,
+
+    pub flash_strength: f64,
+    pub dim_factor: f64,
+    pub dim_constant: f64,
+    pub friction: f64,
+}
+
+pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64, gravity_constant: f64) -> Vec<Sphere> {
     spheres
         .iter()
         .map(|sphere| {
@@ -30,10 +42,8 @@ pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
         }).collect()
 }
 
-pub fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
-    let bounciness = 0.46;
-    let flash_strength = 0.006;
-    let round_to_zero_threshold = 10.0; // Avoid infinite bouncing.
+pub fn bounce(spheres: &Vec<Sphere>, bounciness: f64, flash_strength: f64,
+              bounce_round_to_zero_threshold: f64) -> Vec<Sphere> {
     let mut spheres_copy = spheres.to_vec();
     let new_spheres = spheres_copy.iter_mut()
         .map(|s| RefCell::new(s))
@@ -53,8 +63,8 @@ pub fn bounce(spheres: &Vec<Sphere>) -> Vec<Sphere> {
                 let v_b_c = dir_a_to_b * v_b_c_length;
                 let v_a_c_prime_length = (a.mass * v_a_c_length + b.mass * v_b_c_length - b.mass * (v_a_c_length - v_b_c_length) * bounciness) / (a.mass + b.mass);
                 let v_b_c_prime_length = (b.mass * v_b_c_length + a.mass * v_a_c_length - a.mass * (v_b_c_length - v_a_c_length) * bounciness) / (a.mass + b.mass);
-                let v_a_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_a_c_prime_length);
-                let v_b_c_prime = dir_a_to_b * zero_in(round_to_zero_threshold, v_b_c_prime_length);
+                let v_a_c_prime = dir_a_to_b * zero_in(bounce_round_to_zero_threshold, v_a_c_prime_length);
+                let v_b_c_prime = dir_a_to_b * zero_in(bounce_round_to_zero_threshold, v_b_c_prime_length);
                 let new_speed_a = a.speed - &v_a_c + &v_a_c_prime;
                 let new_speed_b = b.speed - &v_b_c + &v_b_c_prime;
                 let acceleration_a = (a.speed - &new_speed_a).length();
@@ -118,9 +128,8 @@ pub fn move_positions(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     }).collect()
 }
 
-pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let dim_factor = 5.0;
-    let dim_constant = 1.32;
+pub fn dim(spheres: &Vec<Sphere>, delta_t: f64,
+           dim_factor: f64, dim_constant: f64) -> Vec<Sphere> {
     spheres.iter().map(|sphere| {
         Sphere {
             extra_brightness: (sphere.extra_brightness -
@@ -131,8 +140,7 @@ pub fn dim(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
     }).collect()
 }
 
-pub fn friction(spheres: &Vec<Sphere>, delta_t: f64) -> Vec<Sphere> {
-    let friction = 12.1;
+pub fn friction(spheres: &Vec<Sphere>, delta_t: f64, friction: f64) -> Vec<Sphere> {
     let deceleration_factor = delta_t * friction;
     // Something like the following would be a more realistic representation of air resistance:
     // delta_t * friction * sphere.radius.powf(2.0) / sphere.mass.powf(3.0)

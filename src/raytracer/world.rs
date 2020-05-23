@@ -1,5 +1,5 @@
 use crate::raytracer::hit::Hit;
-use crate::raytracer::physics::{bounce, dim, friction, gravitate, move_positions, solve_non_overlapping_constraint};
+use crate::raytracer::physics::{bounce, dim, friction, gravitate, move_positions, PhysicsSettings, solve_non_overlapping_constraint};
 use crate::raytracer::ray::Ray;
 use crate::raytracer::sphere::Sphere;
 
@@ -23,7 +23,8 @@ impl World {
         rec
     }
 
-    pub fn advance(&self, t_real: f64, t_real_previous_frame: f64) -> World {
+    pub fn advance(&self, t_real: f64, t_real_previous_frame: f64,
+                   physics: &PhysicsSettings) -> World {
         let delta_t = world_time_from_real_time(t_real) -
             world_time_from_real_time(t_real_previous_frame);
         World {
@@ -35,11 +36,13 @@ impl World {
                             &gravitate(
                                 &move_positions(
                                     &self.spheres, delta_t),
-                                delta_t)
-                        )
+                                delta_t, physics.gravity_constant),
+                            physics.bounciness,
+                            physics.flash_strength,
+                            physics.bounce_round_to_zero_threshold)
                     ),
-                    delta_t),
-                delta_t)
+                    delta_t, physics.friction),
+                delta_t, physics.dim_factor, physics.dim_constant)
         }
     }
 }

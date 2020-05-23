@@ -8,7 +8,7 @@ use std::io::Read;
 
 use pixel_canvas::{Canvas, Image as CanvasImage};
 
-use crate::animation::animation::{camera_range, make_world, num_frames, sky};
+use crate::animation::animation::{camera_range, make_world, num_frames, physics_settings, sky};
 use crate::export::export::Exporter;
 use crate::export::stopwatch::Stopwatch;
 use crate::raytracer::image::Image;
@@ -53,7 +53,7 @@ fn render(config: Config) {
         let t_real = frame_num as f64 / num_frames() as f64;
         let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames() as f64).max(0.0);
 
-        world = world.advance(t_real, t_real_previous_frame);
+        world = world.advance(t_real, t_real_previous_frame, &physics_settings());
 
         let cams = camera_range(t_real, t_real_previous_frame,
                                 image.width() as f64 / image.height() as f64);
