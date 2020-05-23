@@ -9,7 +9,7 @@
 # Fast and ugly
 resolution_x = 192
 resolution_y = 108
-samples_per_pixel = 2
+samples_per_pixel = 4
 max_depth = 4
 display_scale_factor = 5
 export = false
