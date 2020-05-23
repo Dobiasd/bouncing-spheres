@@ -26,7 +26,6 @@ impl World {
     pub fn advance(&self, t_real: f64, t_real_previous_frame: f64) -> World {
         let delta_t = world_time_from_real_time(t_real) -
             world_time_from_real_time(t_real_previous_frame);
-        println!("delta_t {}", delta_t);
         World {
             spheres:
             dim(
