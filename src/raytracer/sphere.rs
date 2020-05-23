@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::raytracer::hit::{face_normal, Hit};
 use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d::{dot, is_in_interval, Vector3d};
+use crate::raytracer::vector3d::{blend_vectors, dot, is_in_interval, Vector3d};
 
 #[derive(Copy, Clone)]
 pub struct Sphere {
@@ -60,6 +60,6 @@ impl Sphere {
 
     #[inline(always)]
     pub fn center_at_frame_time(&self, frame_time: f64) -> Vector3d {
-        return self.center * frame_time + &(self.center_old * (1.0 - frame_time));
+        return blend_vectors(&self.center, &self.center_old, frame_time);
     }
 }

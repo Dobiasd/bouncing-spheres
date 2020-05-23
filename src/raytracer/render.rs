@@ -3,7 +3,7 @@ use rand::prelude::StdRng;
 use rayon::prelude::*;
 
 use crate::raytracer::camera::{CameraRange, get_ray_camera_blend};
-use crate::raytracer::color::{black, Color};
+use crate::raytracer::color::{black, blend_colors, Color};
 use crate::raytracer::image::Image;
 use crate::raytracer::ray::Ray;
 use crate::raytracer::vector3d::unit_vector;
@@ -35,8 +35,7 @@ fn ray_color(rng: &mut StdRng, ray: &Ray, world: &World,
         None => {}
     }
 
-    let blend = 0.5 * (unit_vector(&ray.direction).y + 1.0);
-    sky.col1 * (1.0 - blend) + &(sky.col2 * blend)
+    blend_colors(&sky.col2, &sky.col1, 0.5 * (unit_vector(&ray.direction).y + 1.0))
 }
 
 pub fn render(width: usize, height: usize,

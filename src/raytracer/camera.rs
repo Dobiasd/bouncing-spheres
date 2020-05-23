@@ -2,7 +2,7 @@ use rand::prelude::StdRng;
 use rand::Rng;
 
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d::{cross, random_in_unit_disk, unit_vector, Vector3d};
+use crate::raytracer::vector3d::{blend, blend_vectors, cross, random_in_unit_disk, unit_vector, Vector3d};
 
 pub struct Camera {
     origin: Vector3d,
@@ -26,12 +26,12 @@ pub fn get_ray_camera_blend(rng: &mut StdRng,
                             cams: &CameraRange) -> Ray {
     let frame_time = rng.gen_range(0.0_f64, 1.0_f64);
     let rd = random_in_unit_disk(rng) *
-        (frame_time * cams.cam_b.lens_radius + (1.0 - frame_time) * cams.cam_a.lens_radius);
+        blend(cams.cam_b.lens_radius, cams.cam_a.lens_radius, frame_time);
     let ray_a = cams.cam_a.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
     let ray_b = cams.cam_b.get_ray_rd(horizontal_fraction, vertical_fraction, rd, frame_time);
     Ray {
-        origin: (ray_b.origin * frame_time + &(ray_a.origin * (1.0 - frame_time))),
-        direction: (ray_b.direction * frame_time + &(ray_a.direction * (1.0 - frame_time))),
+        origin: blend_vectors(&ray_b.origin, &ray_a.origin, frame_time),
+        direction: blend_vectors(&ray_b.direction, &ray_a.direction, frame_time),
         frame_time,
     }
 }

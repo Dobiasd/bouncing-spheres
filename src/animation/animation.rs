@@ -7,7 +7,7 @@ use rand::SeedableRng;
 use uuid::Uuid;
 
 use crate::raytracer::camera::{Camera, CameraRange};
-use crate::raytracer::color::Color;
+use crate::raytracer::color::{blend_colors, Color};
 use crate::raytracer::material::Material;
 use crate::raytracer::render::Sky;
 use crate::raytracer::sphere::Sphere;
@@ -114,7 +114,7 @@ pub fn sky(t_real: f64) -> Sky {
     let night1 = Color { r: 0.8, g: 0.6, b: 0.7 };
     let night2 = Color { r: 0.4, g: 0.1, b: 0.15 };
     Sky {
-        col1: (night1 * sky_factor) + &(day1 * (1.0 - sky_factor)),
-        col2: (night2 * sky_factor) + &(day2 * (1.0 - sky_factor)),
+        col1: blend_colors(&night1, &day1, sky_factor),
+        col2: blend_colors(&night2, &day2, sky_factor),
     }
 }

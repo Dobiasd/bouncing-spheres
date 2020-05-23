@@ -134,6 +134,14 @@ pub fn zero_in(dist_to_zero: f64, x: f64) -> f64 {
     }
 }
 
+pub fn blend(a: f64, b: f64, factor_a: f64) -> f64 {
+    a * factor_a + (b * (1.0 - factor_a))
+}
+
 pub fn null_vector() -> Vector3d {
     Vector3d { x: 0.0, y: 0.0, z: 0.0 }
+}
+
+pub fn blend_vectors(v1: &Vector3d, v2: &Vector3d, factor_v1: f64) -> Vector3d {
+    *v1 * factor_v1 + &(*v2 * (1.0 - factor_v1))
 }

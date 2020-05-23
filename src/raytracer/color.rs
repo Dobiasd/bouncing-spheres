@@ -61,3 +61,7 @@ impl Add<&Color> for Color {
 pub fn black() -> Color {
     Color { r: 0.0, g: 0.0, b: 0.0 }
 }
+
+pub fn blend_colors(col1: &Color, col2: &Color, factor_col1: f64) -> Color {
+    *col1 * factor_col1 + &(*col2 * (1.0 - factor_col1))
+}
