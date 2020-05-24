@@ -13,7 +13,7 @@ use pixel_canvas::{Canvas, Image as CanvasImage};
 
 use crate::animation::animation::{camera_range, make_world, num_frames, physics_settings, sky};
 use crate::export::export::Exporter;
-use crate::export::stopwatch::Stopwatch;
+use crate::export::stopwatch::{measure, Stopwatch};
 use crate::raytracer::image::Image;
 
 mod raytracer;
@@ -56,21 +56,26 @@ fn render(config: Config) {
         let t_real = frame_num as f64 / num_frames() as f64;
         let t_real_previous_frame = ((frame_num as f64 - 1.0) / num_frames() as f64).max(0.0);
 
-        world = world.advance(t_real, t_real_previous_frame, &physics_settings());
+        let (world_advanced, physics_duration) = measure(
+            || world.advance(t_real, t_real_previous_frame, &physics_settings()));
+        world = world_advanced;
 
         let cams = camera_range(t_real, t_real_previous_frame,
                                 image.width() as f64 / image.height() as f64);
 
-        let pixels = raytracer::render::render(
+        let (pixels, render_duration) = measure(|| raytracer::render::render(
             config.resolution_x, config.resolution_y,
             config.samples_per_pixel, config.max_depth, &world,
-            &cams, &sky(t_real));
+            &cams, &sky(t_real)));
 
         plot_pixels(image, &pixels, config.display_scale_factor);
         exporter.process_frame(&pixels, frame_num);
-        info!("Time spent to render the current frame ({}/{}): {} ms",
+        info!("Time spent to render the current frame ({}/{}): {} ms (\
+        {} ms physics + {} ms rendering + display)",
               frame_num + 1, num_frames(),
-              frame_stopwatch.check_and_reset().as_millis());
+              frame_stopwatch.check_and_reset().as_millis(),
+              physics_duration.as_millis(),
+              render_duration.as_millis());
 
         frame_num += 1;
         if frame_num >= num_frames() {

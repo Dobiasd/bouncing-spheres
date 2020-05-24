@@ -11,6 +11,11 @@ impl Stopwatch {
         }
     }
 
+    pub fn elapsed(&mut self) -> Duration {
+        SystemTime::now().duration_since(self.start_time)
+            .expect("Time is broken.")
+    }
+
     pub fn check_and_reset(&mut self) -> Duration {
         let now = SystemTime::now();
         let elapsed = now.duration_since(self.start_time)
@@ -18,4 +23,13 @@ impl Stopwatch {
         self.start_time = now;
         return elapsed;
     }
+}
+
+pub fn measure<F, Res>(mut f: F) -> (Res, Duration)
+    where
+        F: FnMut() -> Res,
+{
+    let mut stopwatch = Stopwatch::new();
+    let result = f();
+    (result, stopwatch.elapsed())
 }
