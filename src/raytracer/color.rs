@@ -2,7 +2,7 @@ use std::ops::{Add, Div, Mul};
 
 use pixel_canvas::Color as CanvasColor;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
@@ -64,4 +64,19 @@ pub fn black() -> Color {
 
 pub fn blend_colors(col1: &Color, col2: &Color, factor_col1: f64) -> Color {
     *col1 * factor_col1 + &(*col2 * (1.0 - factor_col1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_blend() {
+        let result = blend_colors(
+            &Color { r: 1.0, g: 0.0, b: 0.0 },
+            &Color { r: 0.0, g: 1.0, b: 0.0 },
+            0.3
+        );
+        assert_eq!(result, Color { r: 0.3, g: 0.7, b: 0.0 });
+    }
 }
