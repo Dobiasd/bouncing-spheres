@@ -5,7 +5,7 @@ use std::ops::{Add, Div, Mul, Sub};
 use rand::prelude::StdRng;
 use rand::Rng;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vector3d {
     pub x: f64,
     pub y: f64,
@@ -144,4 +144,18 @@ pub fn null_vector() -> Vector3d {
 
 pub fn blend_vectors(v1: &Vector3d, v2: &Vector3d, factor_v1: f64) -> Vector3d {
     *v1 * factor_v1 + &(*v2 * (1.0 - factor_v1))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cross_product() {
+        let result = cross(
+            &Vector3d { x: 1.0, y: 0.0, z: 0.0 },
+            &Vector3d { x: 0.0, y: 1.0, z: 0.0 },
+        );
+        assert_eq!(result, Vector3d { x: 0.0, y: 0.0, z: 1.0 });
+    }
 }
