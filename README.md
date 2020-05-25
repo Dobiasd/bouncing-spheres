@@ -31,11 +31,12 @@ Basically, all it can do is waste a few CPU hours to produce an output video lik
 # Compile and run
 
 ```bash
-RUSTFLAGS="-C target-cpu=native" cargo run --release --package bouncing-spheres --bin main
+RUSTFLAGS="-C target-cpu=native" cargo run --release --package bouncing-spheres --bin main -- --profile=medium 
 ```
 
 When done, you'll find an `output` directory with a bunch of images (`.png`) files and (if `ffmpeg` is available) a video (`.mp4`) in it.
 
 # Render quality
 
-The settings can be changed in `raytracer.toml`.
+You can choose a different pre-set profile by providing `fast` or `slow` instead of `medium` on the command line,
+or by manually tweaking the settings in `raytracer.toml`.

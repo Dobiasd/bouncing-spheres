@@ -5,11 +5,13 @@ extern crate serde;
 extern crate serde_derive;
 extern crate simple_logger;
 
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 
 use log::info;
 use pixel_canvas::{Canvas, Image as CanvasImage};
+use structopt::StructOpt;
 
 use crate::animation::animation::{camera_range, make_world, num_frames, physics_settings, sky};
 use crate::export::export::Exporter;
@@ -20,8 +22,16 @@ mod raytracer;
 mod animation;
 mod export;
 
-#[derive(Debug, Deserialize)]
-struct Config {
+#[derive(StructOpt)]
+struct Cli {
+    #[structopt(default_value = "raytracer.toml", long)]
+    config_path: String,
+    #[structopt(short, long)]
+    profile: String,
+}
+
+#[derive(Debug, Deserialize, Clone, Copy)]
+struct Profile {
     resolution_x: usize,
     resolution_y: usize,
     samples_per_pixel: usize,
@@ -30,25 +40,32 @@ struct Config {
     export: bool,
 }
 
-fn read_config() -> Config {
-    let config_path = "raytracer.toml";
-    let mut config_file_content = String::new();
-    File::open(config_path).and_then(|mut f| {
-        f.read_to_string(&mut config_file_content)
-    }).expect(&format!("Unable to read config file: {}", config_path));
-    toml::from_str(&config_file_content)
-        .expect(&format!("Unable to parse config file: {}", config_path))
+#[derive(Debug, Deserialize)]
+struct Config {
+    profiles: HashMap<String, Profile>,
 }
 
-fn render(config: Config) {
+fn load_config() -> Profile {
+    let args = Cli::from_args();
+    let mut config_file_content = String::new();
+    File::open(&args.config_path).and_then(|mut f| {
+        f.read_to_string(&mut config_file_content)
+    }).expect(&format!("Unable to read config file: {}", &args.config_path));
+    *toml::from_str::<Config>(&config_file_content)
+        .expect(&format!("Unable to parse config file: {}", &args.config_path))
+        .profiles.get(&args.profile)
+        .expect(&format!("Unknown profile: {}", &args.profile))
+}
+
+fn render(profile: Profile) {
     let mut world = make_world();
 
     let canvas = Canvas::new(
-        config.resolution_x * config.display_scale_factor,
-        config.resolution_y * config.display_scale_factor)
+        profile.resolution_x * profile.display_scale_factor,
+        profile.resolution_y * profile.display_scale_factor)
         .title("bouncing-spheres");
 
-    let exporter = Exporter::new(config.export);
+    let exporter = Exporter::new(profile.export);
     let mut frame_num = 0;
     let mut frame_stopwatch = Stopwatch::new();
 
@@ -64,11 +81,11 @@ fn render(config: Config) {
                                 image.width() as f64 / image.height() as f64);
 
         let (pixels, render_duration) = measure(|| raytracer::render::render(
-            config.resolution_x, config.resolution_y,
-            config.samples_per_pixel, config.max_depth, &world,
+            profile.resolution_x, profile.resolution_y,
+            profile.samples_per_pixel, profile.max_depth, &world,
             &cams, &sky(t_real)));
 
-        plot_pixels(image, &pixels, config.display_scale_factor);
+        plot_pixels(image, &pixels, profile.display_scale_factor);
         exporter.process_frame(&pixels, frame_num);
         info!("Time spent to render the current frame ({}/{}): {} ms (\
         {} ms physics + {} ms rendering + display)",
@@ -100,5 +117,5 @@ fn plot_pixels(image: &mut CanvasImage, pixels: &Image, scale_factor: usize) {
 fn main()
 {
     simple_logger::init().unwrap();
-    render(read_config());
+    render(load_config());
 }
