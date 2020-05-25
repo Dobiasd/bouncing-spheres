@@ -24,6 +24,11 @@ impl Color {
         let b = (self.b.max(0.0).min(1.0) * 255.0) as u8;
         CanvasColor { r, g, b }
     }
+
+    pub fn black() -> Color
+    {
+        Color { r: 0.0, g: 0.0, b: 0.0 }
+    }
 }
 
 impl Mul<f64> for Color {
@@ -58,10 +63,6 @@ impl Add<&Color> for Color {
     }
 }
 
-pub fn black() -> Color {
-    Color { r: 0.0, g: 0.0, b: 0.0 }
-}
-
 pub fn blend_colors(col1: &Color, col2: &Color, factor_col1: f64) -> Color {
     *col1 * factor_col1 + &(*col2 * (1.0 - factor_col1))
 }
@@ -75,7 +76,7 @@ mod tests {
         let result = blend_colors(
             &Color { r: 1.0, g: 0.0, b: 0.0 },
             &Color { r: 0.0, g: 1.0, b: 0.0 },
-            0.3
+            0.3,
         );
         assert_eq!(result, Color { r: 0.3, g: 0.7, b: 0.0 });
     }
