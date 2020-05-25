@@ -8,6 +8,7 @@ extern crate simple_logger;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
+use std::time::Instant;
 
 use log::info;
 use pixel_canvas::{Canvas, Image as CanvasImage};
@@ -67,7 +68,7 @@ fn render(profile: Profile) {
 
     let exporter = Exporter::new(profile.export);
     let mut frame_num = 0;
-    let mut frame_stopwatch = Stopwatch::new();
+    let mut frame_stopwatch = Instant::now();
 
     canvas.render(move |_, image| {
         let t_real = frame_num as f64 / num_frames() as f64;
