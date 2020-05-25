@@ -1,7 +1,7 @@
 [package]
 name = "bouncing-spheres"
 version = "0.1.0"
-authors = ["Dobiasd <editgym@gmail.com>"]
+authors = ["Tobias Hermann <editgym@gmail.com>"]
 edition = "2018"
 
 [dependencies]
