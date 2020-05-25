@@ -1,25 +1,23 @@
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 
 pub struct Stopwatch {
-    start_time: SystemTime
+    start_time: Instant
 }
 
 impl Stopwatch {
     pub fn new() -> Stopwatch {
         Stopwatch {
-            start_time: SystemTime::now()
+            start_time: Instant::now()
         }
     }
 
     pub fn elapsed(&mut self) -> Duration {
-        SystemTime::now().duration_since(self.start_time)
-            .expect("Time is broken.")
+        Instant::now().duration_since(self.start_time)
     }
 
     pub fn check_and_reset(&mut self) -> Duration {
-        let now = SystemTime::now();
-        let elapsed = now.duration_since(self.start_time)
-            .expect("Time is broken.");
+        let now = Instant::now();
+        let elapsed = now.duration_since(self.start_time);
         self.start_time = now;
         return elapsed;
     }
