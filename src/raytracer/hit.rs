@@ -1,6 +1,6 @@
 use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
-use crate::raytracer::vector3d::{dot, null_vector, Vector3d};
+use crate::raytracer::vector3d::{dot, Vector3d};
 
 pub struct Hit {
     pub position: Vector3d,
@@ -16,7 +16,7 @@ pub fn face_normal(r: &Ray, outward_normal: &Vector3d) -> (bool, Vector3d) {
     let normal = if front_face {
         *outward_normal
     } else {
-        null_vector() - &outward_normal
+        Vector3d::null() - &outward_normal
     };
     (front_face, normal)
 }
