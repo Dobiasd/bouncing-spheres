@@ -1,5 +1,3 @@
-use uuid::Uuid;
-
 use crate::raytracer::hit::{face_normal, Hit};
 use crate::raytracer::material::Material;
 use crate::raytracer::ray::Ray;
@@ -7,7 +5,6 @@ use crate::raytracer::vector3d::{blend_vectors, dot, is_in_interval, Vector3d};
 
 #[derive(Copy, Clone)]
 pub struct Sphere {
-    pub id: Uuid,
     pub center: Vector3d,
     pub radius: f64,
     pub material: Material,

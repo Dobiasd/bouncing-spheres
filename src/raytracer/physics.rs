@@ -26,7 +26,7 @@ pub fn gravitate(spheres: &Vec<Sphere>, delta_t: f64, gravity_constant: f64) -> 
             let acceleration = spheres
                 .iter()
                 .map(|other| {
-                    if other.id == sphere.id {
+                    if other as *const _ == sphere as *const _ {
                         Vector3d::null()
                     } else {
                         let diff = other.center - &sphere.center;

@@ -4,7 +4,6 @@ use std::ops::{Add, Div, Mul, Sub};
 use rand::prelude::StdRng;
 use rand::Rng;
 use rand::SeedableRng;
-use uuid::Uuid;
 
 use crate::raytracer::camera::{Camera, CameraRange};
 use crate::raytracer::color::{blend_colors, Color};
@@ -27,7 +26,6 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
         z: rng.gen_range(min, max),
     };
     Sphere {
-        id: Uuid::new_v4(),
         center,
         radius,
         material: Material {
@@ -51,7 +49,6 @@ pub fn make_world() -> World {
     let radius_planet = 6371.0;
     let center = Vector3d { x: 0.0, y: -radius_planet, z: 0.0 };
     let planet = Sphere {
-        id: Uuid::new_v4(),
         center,
         radius: radius_planet,
         material: Material {
