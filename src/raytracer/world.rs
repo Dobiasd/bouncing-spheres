@@ -1,3 +1,4 @@
+use crate::animation::animation::world_time_from_real_time;
 use crate::raytracer::hit::Hit;
 use crate::raytracer::physics::{bounce, dim, friction, gravitate, move_positions, PhysicsSettings, solve_non_overlapping_constraint};
 use crate::raytracer::ray::Ray;
@@ -45,8 +46,4 @@ impl World {
                 delta_t, physics.dim_factor, physics.dim_constant)
         }
     }
-}
-
-fn world_time_from_real_time(t_real: f64) -> f64 {
-    t_real - (50.0 * (t_real - 0.417)).tanh() / 50.0 - 0.02
 }

@@ -128,3 +128,7 @@ pub fn physics_settings() -> PhysicsSettings {
         friction: 12.1,
     }
 }
+
+pub fn world_time_from_real_time(t_real: f64) -> f64 {
+    t_real - (50.0 * (t_real - 0.417)).tanh() / 50.0 - 0.02
+}
