@@ -22,6 +22,15 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
         y: rng.gen_range(min, max),
         z: rng.gen_range(min, max),
     };
+
+    let speed_min = -4.0_f64;
+    let speed_max = 4.0_f64;
+
+    let speed = Vector3d {
+        x: rng.gen_range(speed_min, speed_max),
+        y: rng.gen_range(speed_min, speed_max),
+        z: rng.gen_range(speed_min, speed_max),
+    };
     Sphere {
         center,
         radius,
@@ -34,8 +43,8 @@ fn random_sphere(rng: &mut StdRng) -> Sphere {
             reflectiveness: 1.0 + 0.0 * rng.gen_range(0.0, 1.0),
             reflection_fuzz: 0.0 + 0.0 * rng.gen_range(0.0, 1.0),
         },
-        speed: Vector3d::null(),
-        mass: radius.powf(3.0),
+        speed,
+        mass: 1.0,
         extra_brightness: 0.0,
         center_old: center,
     }
